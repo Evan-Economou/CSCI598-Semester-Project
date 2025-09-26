@@ -12,7 +12,7 @@ An AI-powered code evaluation system designed for educational settings to accele
 - **Environment**: Local deployment with no user accounts or multi-user features
 
 ### Supported Languages
-- **C++ only**: `.cpp` and `.h` files
+- **C++ only**: `.cpp`, `.hpp`, and `.h` files
 
 ## Functional Specifications
 
@@ -58,7 +58,7 @@ An AI-powered code evaluation system designed for educational settings to accele
 #### 2.2 Core Interface Components
 
 ##### File Management Panel
-- **File Upload**: Support for individual `.cpp` and `.h` files
+- **File Upload**: Support for individual `.cpp`, `.hpp`, and `.h` files
 - **Folder Upload**: Ability to select and upload entire directories
 - **File Browser**: List view of all uploaded files
 - **File Selection**: Click-to-select individual files for analysis
@@ -90,7 +90,7 @@ An AI-powered code evaluation system designed for educational settings to accele
 ### 3. Data Management
 
 #### 3.1 Input Data Formats
-- **Code Files**: `.cpp` and `.h` files
+- **Code Files**: `.cpp`, `.hpp`, and `.h` files
 - **Style Guides**: Plain text format with structured sections
 - **RAG Documents**: Various text formats for reference materials
 
@@ -195,8 +195,7 @@ An AI-powered code evaluation system designed for educational settings to accele
 ### 8.2 Educational Value
 - **Time Savings**: Significantly reduce manual grading time
 - **Consistency**: Provide consistent evaluation across all student submissions
-- **Learning Aid**: Help students understand style guide requirements
-- **Feedback Quality**: Generate clear, educational violation explanations
+- **Feedback Quality**: Generate clear, violation explanations
 
 ## Future Considerations
 
