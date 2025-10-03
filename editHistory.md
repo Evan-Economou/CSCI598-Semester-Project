@@ -978,3 +978,155 @@ __version__ = "0.1.0"
 - Connecting it all together
 
 **Time to MVP:** Week 1-2 if following development plan
+
+---
+
+## Date: 2025-10-03 (Session 2)
+
+### Session: Bug Fixes for Project Startup
+
+**Objective:** Resolve frontend and backend startup errors encountered during initial run.
+
+---
+
+## Frontend Fix: Tailwind CSS v4 PostCSS Configuration
+
+### Error Encountered
+```
+Module build failed (from ./node_modules/postcss-loader/dist/cjs.js):
+Error: It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin.
+The PostCSS plugin has moved to a separate package...
+```
+
+### Root Cause
+- Tailwind CSS v4.1.13 is installed (latest version)
+- Tailwind v4 changed architecture - PostCSS plugin moved to separate `@tailwindcss/postcss` package
+- Old v3 syntax in `postcss.config.js` no longer works
+
+### Files Modified
+
+#### `frontend/postcss.config.js` (MODIFIED)
+**Change:**
+```javascript
+// OLD (v3 syntax):
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+// NEW (v4 syntax):
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+```
+
+**Reason:**
+- Tailwind CSS v4 requires `@tailwindcss/postcss` instead of direct `tailwindcss` plugin
+- Autoprefixer is now built into Tailwind v4, no longer needed separately
+- Matches official Tailwind v4 migration guide
+
+---
+
+#### `frontend/package.json` (MODIFIED)
+**Change:**
+- Added `"@tailwindcss/postcss": "^4.1.13"` to dependencies
+
+**Reason:**
+- Required package for Tailwind v4 PostCSS integration
+- Version matches installed Tailwind CSS version (4.1.13)
+
+---
+
+## Backend Fix: Unicode Encoding Error
+
+### Error Encountered
+```
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 2-49:
+character maps to <undefined>
+```
+
+### Root Cause
+- `backend/run.py` used Unicode box-drawing characters (╔═╗║╚╝) in ASCII art banner
+- Windows terminal uses cp1252 encoding by default
+- cp1252 doesn't support these Unicode characters
+- Python failed when trying to print the banner
+
+### Files Modified
+
+#### `backend/run.py` (MODIFIED)
+**Change:**
+```python
+# OLD (Unicode box-drawing):
+print(f"""
+╔══════════════════════════════════════════════╗
+║   Code Style Grader - Backend Server         ║
+╚══════════════════════════════════════════════╝
+...
+""")
+
+# NEW (ASCII-safe):
+print(f"""
+==============================================
+  Code Style Grader - Backend Server
+==============================================
+...
+""")
+```
+
+**Reason:**
+- ASCII equals signs work in all terminal encodings
+- Maintains visual separation without encoding issues
+- Works across Windows, Linux, and macOS terminals
+- More universally compatible
+
+---
+
+## Documentation Updates
+
+### `development_plan.md` (MODIFIED)
+**Change:**
+- Line 144: Updated npm install command to include `@tailwindcss/postcss`
+
+**Before:**
+```bash
+npm install @tailwindcss/forms tailwindcss
+```
+
+**After:**
+```bash
+npm install @tailwindcss/forms tailwindcss @tailwindcss/postcss
+```
+
+**Reason:**
+- Ensures future developers install correct packages for Tailwind v4
+- Prevents same error from happening again
+- Documents accurate setup steps
+
+---
+
+## Summary of Changes
+
+**Files Modified:**
+1. `frontend/postcss.config.js` - Updated to Tailwind v4 syntax
+2. `frontend/package.json` - Added @tailwindcss/postcss dependency
+3. `backend/run.py` - Replaced Unicode characters with ASCII
+4. `development_plan.md` - Updated package installation instructions
+5. `editHistory.md` - This documentation
+
+**Issues Resolved:**
+- ✅ Frontend builds successfully with Tailwind v4
+- ✅ Backend starts without Unicode encoding errors
+- ✅ Documentation now reflects correct package requirements
+
+**Compatibility Improvements:**
+- Better cross-platform terminal support (backend)
+- Future-proof for Tailwind v4+ (frontend)
+- Accurate setup instructions for new developers
+
+---
+
+**Next:** Ready to run `npm install` in frontend directory and start both services

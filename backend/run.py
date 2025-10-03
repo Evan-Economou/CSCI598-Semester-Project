@@ -9,9 +9,9 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
 
     print(f"""
-╔══════════════════════════════════════════════╗
-║   Code Style Grader - Backend Server         ║
-╚══════════════════════════════════════════════╝
+==============================================
+  Code Style Grader - Backend Server
+==============================================
 
 Starting server at http://{host}:{port}
 
