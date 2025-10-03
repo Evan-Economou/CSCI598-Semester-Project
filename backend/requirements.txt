@@ -1,0 +1,24 @@
+# Core FastAPI dependencies
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.0
+
+# Code parsing
+tree-sitter==0.20.4
+tree-sitter-cpp==0.23.4
+
+# LLM integration
+ollama==0.1.7
+
+# RAG and embeddings
+chromadb==0.4.18
+sentence-transformers==2.2.2
+
+# Utilities
+python-dotenv==1.0.0
+numpy==1.24.3
+
+# Testing (for future use)
+pytest==7.4.3
+pytest-asyncio==0.21.1

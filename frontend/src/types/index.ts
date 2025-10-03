@@ -1,0 +1,46 @@
+/**
+ * Type definitions for Code Style Grader frontend
+ */
+
+export enum ViolationSeverity {
+  CRITICAL = 'CRITICAL',
+  WARNING = 'WARNING',
+  MINOR = 'MINOR',
+}
+
+export interface Violation {
+  type: string;
+  severity: ViolationSeverity;
+  line_number: number;
+  column?: number;
+  description: string;
+  style_guide_reference?: string;
+  code_snippet?: string;
+}
+
+export interface AnalysisResult {
+  file_name: string;
+  file_path: string;
+  timestamp: string;
+  violations: Violation[];
+  total_violations: number;
+  violations_by_severity: Record<string, number>;
+  violations_by_type: Record<string, number>;
+  status: string;
+  error_message?: string;
+}
+
+export interface UploadedFile {
+  file_id: string;
+  file_name: string;
+  file_size: number;
+  content?: string;
+  status: string;
+}
+
+export interface RAGDocument {
+  id: string;
+  filename: string;
+  type: 'style_guide' | 'reference';
+  status: string;
+}
