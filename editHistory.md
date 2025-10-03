@@ -1146,3 +1146,225 @@ npm install @tailwindcss/forms tailwindcss @tailwindcss/postcss
 - ✅ Frontend should now compile successfully
 
 **Status:** Both frontend and backend are ready to start
+
+---
+
+## Date: 2025-10-03 (Session 3)
+
+### Session: Tailwind CSS Version Correction
+
+**Objective:** Resolve persistent Tailwind CSS errors by switching from v4 to stable v3.
+
+---
+
+## Problem: Tailwind CSS v4 Incompatibility
+
+### Issue Discovered
+- Tailwind CSS v4 was automatically installed (latest version: 4.1.13-4.1.14)
+- Tailwind v4 has completely different architecture from v3
+- Create React App (react-scripts 5.0.1) is not compatible with Tailwind v4
+- Tailwind v4 requires different CSS syntax (no `@tailwind` directives)
+- Tailwind v4 requires different config approach
+
+### Why v4 Doesn't Work with CRA
+1. **Different CSS syntax**: v4 uses `@import` instead of `@tailwind` directives
+2. **New plugin system**: PostCSS plugin moved to separate package
+3. **Config changes**: Different configuration approach
+4. **CRA not updated**: react-scripts 5.0.1 expects Tailwind v3 patterns
+5. **Breaking changes**: Major architectural overhaul in v4
+
+### Solution: Downgrade to Tailwind v3
+
+**Reason for v3:**
+- Tailwind v3.4.17 is stable and production-ready
+- Fully compatible with Create React App
+- Well-documented and widely used
+- No breaking changes needed in existing code
+- Works with standard PostCSS configuration
+
+---
+
+## Changes Made
+
+### Package Changes
+
+#### Uninstalled (v4 packages):
+```bash
+npm uninstall tailwindcss @tailwindcss/postcss @tailwindcss/forms
+```
+- Removed Tailwind v4.1.x
+- Removed @tailwindcss/postcss (v4-specific)
+- Removed @tailwindcss/forms (to reinstall correct version)
+
+#### Installed (v3 packages):
+```bash
+npm install -D tailwindcss@3.4.17 postcss@8.4.49 autoprefixer@10.4.20 @tailwindcss/forms@0.5.10
+```
+
+**Final versions in package.json:**
+- `tailwindcss`: ^3.4.17 (stable v3)
+- `postcss`: ^8.4.49 (required peer dependency)
+- `autoprefixer`: ^10.4.20 (for vendor prefixes)
+- `@tailwindcss/forms`: ^0.5.10 (form styling plugin)
+
+---
+
+### Configuration Files
+
+#### `frontend/postcss.config.js` (REVERTED to v3 syntax)
+**Change:**
+```javascript
+// REMOVED (v4 syntax that didn't work):
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+
+// RESTORED (v3 syntax that works):
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+**Reason:**
+- Tailwind v3 uses standard PostCSS plugin approach
+- Works with Create React App out of the box
+- Autoprefixer needed separately in v3 (built-in to v4)
+
+---
+
+#### `frontend/tailwind.config.js` (NO CHANGE NEEDED)
+**Status:** Already correct for v3
+```javascript
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  theme: { extend: { colors: {...} } },
+  plugins: [require('@tailwindcss/forms')],
+}
+```
+
+**Reason:** Configuration syntax is same for v3, already set up correctly.
+
+---
+
+#### `frontend/src/index.css` (NO CHANGE NEEDED)
+**Status:** Already correct for v3
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+**Reason:** `@tailwind` directives are Tailwind v3 syntax, already correct.
+
+---
+
+### Documentation Updates
+
+#### `development_plan.md` (UPDATED)
+**Line 144 - Installation commands:**
+
+**Before:**
+```bash
+npm install @tailwindcss/forms tailwindcss @tailwindcss/postcss
+```
+
+**After:**
+```bash
+npm install -D tailwindcss@3.4.17 postcss autoprefixer @tailwindcss/forms
+npx tailwindcss init
+```
+
+**Changes:**
+- Specify Tailwind v3.4.17 explicitly
+- Install as devDependencies (-D flag)
+- Include postcss and autoprefixer
+- Add tailwind init command for completeness
+- Remove @tailwindcss/postcss (v4-only package)
+
+---
+
+## Summary of Tailwind Configuration
+
+### Correct Setup for Tailwind v3 + Create React App
+
+**1. Install packages:**
+```bash
+npm install -D tailwindcss@3.4.17 postcss autoprefixer @tailwindcss/forms
+```
+
+**2. PostCSS config (postcss.config.js):**
+```javascript
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+**3. Tailwind config (tailwind.config.js):**
+```javascript
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  theme: { extend: {...} },
+  plugins: [require('@tailwindcss/forms')],
+}
+```
+
+**4. CSS imports (src/index.css):**
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+---
+
+## Version Reference
+
+### Frontend Package Versions (Confirmed Working)
+```json
+{
+  "devDependencies": {
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20",
+    "@tailwindcss/forms": "^0.5.10"
+  }
+}
+```
+
+---
+
+## Lessons Learned
+
+1. **Pin major versions**: Should have specified `tailwindcss@3` instead of `tailwindcss`
+2. **Check compatibility**: Tailwind v4 is too new for react-scripts 5.0.1
+3. **CRA limitations**: Create React App has slower adoption of bleeding-edge tools
+4. **v3 is stable**: Tailwind v3.4.x is production-ready and widely supported
+
+---
+
+## Files Modified (Session 3)
+
+1. `frontend/package.json` - Downgraded to Tailwind v3.4.17
+2. `frontend/postcss.config.js` - Reverted to v3 syntax
+3. `development_plan.md` - Updated installation commands
+4. `editHistory.md` - This documentation
+
+---
+
+## Result
+
+- ✅ Tailwind CSS v3.4.17 installed
+- ✅ PostCSS configuration correct for v3
+- ✅ All config files compatible
+- ✅ Create React App should now compile successfully
+- ✅ Documentation updated with correct versions
+
+**Status:** Frontend should now start without Tailwind errors

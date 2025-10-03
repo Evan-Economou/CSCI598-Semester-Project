@@ -141,7 +141,8 @@ class StyleGuideProcessor:
 ```bash
 npx create-react-app frontend --template typescript
 npm install @monaco-editor/react axios lucide-react
-npm install @tailwindcss/forms tailwindcss @tailwindcss/postcss
+npm install -D tailwindcss@3.4.17 postcss autoprefixer @tailwindcss/forms
+npx tailwindcss init
 ```
 
 **Core Components Structure:**
