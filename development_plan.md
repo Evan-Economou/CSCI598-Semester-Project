@@ -65,7 +65,7 @@ uvicorn==0.24.0
 python-multipart==0.0.6
 pydantic==2.5.0
 tree-sitter==0.20.4
-tree-sitter-cpp==0.20.0
+tree-sitter-cpp==0.23.4
 ollama==0.1.7
 chromadb==0.4.18
 python-dotenv==1.0.0
