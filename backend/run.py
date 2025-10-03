@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     print(f"""
 ╔══════════════════════════════════════════════╗
-║   Code Style Grader - Backend Server        ║
+║   Code Style Grader - Backend Server         ║
 ╚══════════════════════════════════════════════╝
 
 Starting server at http://{host}:{port}
