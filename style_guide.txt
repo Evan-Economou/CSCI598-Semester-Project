@@ -1,0 +1,156 @@
+C++ Style Guide
+================================================================================
+
+This style guide defines coding standards for C++ assignments. Violations are
+categorized by severity: CRITICAL (must fix), WARNING (should fix), and
+MINOR (good practice).
+
+================================================================================
+
+CRITICAL
+
+- No tabs for indentation - use spaces only (4 spaces per indent level)
+- Opening braces must be on the same line as the declaration or statement
+- No trailing whitespace at the end of lines
+- Lines must not exceed 100 characters (except for URLs or long string literals)
+- All control structures (if, for, while, switch) must use braces even for single statements
+- No memory leaks - all allocated memory must be properly freed
+- No use of goto statements
+- Function parameters must not shadow member variables or other parameters
+- All switch statements must have a default case
+- No use of magic numbers - use named constants instead
+
+
+WARNING
+
+- Maximum line length should not exceed 80 characters for readability
+- Function names should use camelCase convention
+- Class names should use PascalCase convention
+- Member variables should have descriptive names (avoid single letters except for loop counters)
+- Avoid deeply nested code (more than 3 levels of nesting)
+- Functions should be reasonably short (under 50 lines)
+- Use const correctness for function parameters and member functions
+- Include guards must be present in all header files
+- Avoid using namespace std in header files
+- Use nullptr instead of NULL or 0 for pointers
+- Prefer pre-increment (++i) over post-increment (i++) in loops
+- Add blank lines between logical sections of code for readability
+
+
+MINOR
+
+- File must have a header comment at the top describing purpose and author
+- Functions should have brief comments explaining their purpose
+- Complex algorithms should include explanatory comments
+- Variable declarations should be one per line
+- Use whitespace around operators for readability (e.g., a + b not a+b)
+- Align related declarations vertically when it improves readability
+- Include file organization: system includes first, then project includes
+- Use consistent indentation throughout the file
+- End files with a single newline character
+- Use meaningful variable names (avoid abbreviations unless well-known)
+- Group related member functions together in class definitions
+- Separate public/private/protected sections clearly in classes
+
+
+================================================================================
+
+Examples of Good Style:
+================================================================================
+
+// File header comment
+// Program: Calculator
+// Author: John Doe
+// Purpose: Simple arithmetic calculator
+
+#include <iostream>
+#include <string>
+
+const int MAX_SIZE = 100;  // Named constant instead of magic number
+
+class Calculator {
+public:
+    // Constructor with member initializer list
+    Calculator() : result(0) {
+    }
+
+    // Function with const correctness
+    int add(int a, int b) const {
+        return a + b;
+    }
+
+private:
+    int result;
+};
+
+int main() {
+    int sum = 0;
+
+    // Control structure with braces
+    if (sum == 0) {
+        std::cout << "Sum is zero" << std::endl;
+    }
+
+    // Loop with proper indentation
+    for (int i = 0; i < MAX_SIZE; ++i) {
+        sum += i;
+    }
+
+    return 0;
+}
+
+================================================================================
+
+Common Violations to Avoid:
+================================================================================
+
+BAD: Using tabs for indentation
+	int x = 5;  // Tab character used
+
+GOOD: Using spaces for indentation
+    int x = 5;  // 4 spaces used
+
+
+BAD: Opening brace on next line
+if (condition)
+{
+    doSomething();
+}
+
+GOOD: Opening brace on same line
+if (condition) {
+    doSomething();
+}
+
+
+BAD: Missing braces for single statement
+if (condition)
+    doSomething();
+
+GOOD: Always use braces
+if (condition) {
+    doSomething();
+}
+
+
+BAD: Magic numbers
+if (age > 18) {
+    // ...
+}
+
+GOOD: Named constants
+const int LEGAL_AGE = 18;
+if (age > LEGAL_AGE) {
+    // ...
+}
+
+
+BAD: Trailing whitespace
+int x = 5;
+
+GOOD: No trailing whitespace
+int x = 5;
+
+================================================================================
+End of Style Guide
+================================================================================
