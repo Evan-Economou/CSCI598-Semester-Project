@@ -59,6 +59,9 @@ coverage/
 # Production
 /build
 
+# AI agent instructions
+.github/copilot-instructions.md
+
 # Misc
 .DS_Store
 *.log

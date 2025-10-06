@@ -1368,3 +1368,62 @@ module.exports = {
 - ✅ Documentation updated with correct versions
 
 **Status:** Frontend should now start without Tailwind errors
+
+---
+
+## Date: 2025-10-06
+
+### Session: Basic Style Guide Violation Detection & Classification (Backend MVP)
+
+Objective: Implement the initial backend capability to parse plain-text style guides and detect/classify common C++ style violations, aligning with development_plan.md (Backend MVP).
+
+---
+
+Backend Changes
+
+### Data Models
+
+#### backend/app/models/core.py (MODIFIED)
+- Added lightweight schemas to support analyzer I/O:
+  - Severity enum (CRITICAL, WARNING, MINOR)
+  - StyleGuideRule (id, text, severity, section)
+  - Violation (rule_id, severity, line, column, description, guide_section)
+  - AnalysisRequest (code, filename, style_guide_text)
+  - AnalysisResult (file_name, analyzed_at, violations, summary by severity)
+- Reason: Provide a minimal, analyzer-focused contract for MVP detection and summaries while keeping existing models for broader API responses.
+
+### Services
+
+#### backend/app/services/style_guide_service.py (MODIFIED)
+- Implemented robust plain-text parsing:
+  - Section detection via ALL-CAPS headers
+  - Bullet-point rule extraction
+  - Severity inference from section name
+  - Stable rule IDs via SHA1(section+text)
+- Reason: Matches project conventions for style guide format and enables rule-to-check mapping.
+
+### Parsers / Analysis
+
+#### backend/app/parsers/cpp_analyzer.py (MODIFIED)
+- Implemented a lightweight analyzer with rule-to-check mapping:
+  - No tabs for indentation
+  - Trailing whitespace detection
+  - Line length limit (extracts numeric limit, defaults to 100)
+  - Opening brace on same line (basic K&R detection for statements/functions)
+  - File header comment presence
+- Emits violations with severity and style guide references and returns severity summary counts.
+- Reason: Provides fast, deterministic checks for common formatting rules; forms the basis for later Tree-sitter/LLM integration.
+
+---
+
+Notes & Compatibility
+- Parsing assumptions: ALL-CAPS headers demarcate sections; rules are bullet lines starting with “-” or “*”.
+- Analyzer focuses on text-based heuristics (MVP), independent of Tree-sitter/LLM for now.
+- Existing API endpoints remain unchanged; wiring analyze endpoint to this analyzer is next.
+
+---
+
+Next Steps
+1. Wire api/analysis.py to invoke CppAnalyzer.analyze with uploaded code and selected style guide.
+2. Add unit tests for style_guide_service and cpp_analyzer checks.
+3. Extend rule-to-check mapping (naming conventions, include guards, spacing rules) and integrate Tree-sitter when ready.

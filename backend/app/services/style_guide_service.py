@@ -1,8 +1,14 @@
 """
 Style guide processing service
 """
-from typing import List, Dict
-from app.models.core import StyleGuide, StyleGuideRule, ViolationSeverity
+import re
+import hashlib
+from typing import List, Tuple, Dict
+from app.models.core import StyleGuide, StyleGuideRule, ViolationSeverity, Severity
+
+
+SECTION_HEADER_RE = re.compile(r"^\s*([A-Z][A-Z0-9 _-]{2,})\s*$")
+BULLET_RE = re.compile(r"^\s*[-*]\s+(.*\S)\s*$")
 
 
 class StyleGuideProcessor:
@@ -23,37 +29,63 @@ class StyleGuideProcessor:
         MINOR
         - Rule 4
         """
-        rules = []
-        current_severity = None
-
-        lines = content.split('\n')
-
-        for line in lines:
-            line = line.strip()
-
-            # Check if this is a severity header
-            if line in ["CRITICAL", "WARNING", "MINOR"]:
-                current_severity = ViolationSeverity(line)
-                continue
-
-            # Parse rule (assuming bullet point format)
-            if line.startswith('-') or line.startswith('*'):
-                if current_severity:
-                    rule_text = line[1:].strip()
-                    if rule_text:  # Only add non-empty rules
-                        rules.append(
-                            StyleGuideRule(
-                                severity=current_severity,
-                                rule_name=rule_text[:50],  # First 50 chars as name
-                                description=rule_text
-                            )
-                        )
+        sections = self._split_into_sections(content)
+        rules: List[StyleGuideRule] = []
+        for section_name, lines in sections:
+            severity = self._severity_from_section(section_name)
+            for line in lines:
+                m = BULLET_RE.match(line)
+                if not m:
+                    continue
+                text = m.group(1).strip()
+                rid = self._rule_id(section_name, text)
+                rules.append(StyleGuideRule(
+                    id=rid,
+                    text=text,
+                    severity=severity,
+                    section=section_name.strip()
+                ))
 
         return StyleGuide(
             name=name,
             rules=rules,
             raw_content=content
         )
+
+    def _split_into_sections(self, content: str) -> List[Tuple[str, List[str]]]:
+        lines = content.splitlines()
+        sections: List[Tuple[str, List[str]]] = []
+        current_name = "GENERAL"
+        current_lines: List[str] = []
+        for line in lines:
+            if SECTION_HEADER_RE.match(line):
+                # push previous
+                if current_lines:
+                    sections.append((current_name, current_lines))
+                current_name = line.strip()
+                current_lines = []
+            else:
+                current_lines.append(line)
+        if current_lines:
+            sections.append((current_name, current_lines))
+        return sections
+
+    def _severity_from_section(self, name: str) -> Severity:
+        name_up = name.upper()
+        if "CRITICAL" in name_up:
+            return Severity.CRITICAL
+        if "WARNING" in name_up:
+            return Severity.WARNING
+        if "MINOR" in name_up:
+            return Severity.MINOR
+        # Default fallback if unspecified
+        return Severity.WARNING
+
+    def _rule_id(self, section: str, text: str) -> str:
+        # Stable short id derived from section+text
+        base = f"{section}::{text}"
+        digest = hashlib.sha1(base.encode("utf-8")).hexdigest()[:10]
+        return f"rule_{digest}"
 
     def extract_sections(self, content: str) -> Dict[str, List[str]]:
         """Extract sections organized by severity"""
