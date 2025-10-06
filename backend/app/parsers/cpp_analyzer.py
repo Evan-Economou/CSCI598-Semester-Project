@@ -3,7 +3,7 @@ Main C++ code analyzer combining tree-sitter and LLM analysis
 """
 import re
 from typing import Callable, Dict, List, Optional, Tuple
-from app.models.core import Severity, Violation, AnalysisRequest, AnalysisResult, StyleGuideRule
+from app.models.core import ViolationSeverity, Violation, AnalysisResult  # updated import
 from app.parsers.cpp_parser import TreeSitterParser
 from app.services.ollama_service import OllamaService
 from app.services.rag_service import RAGService
@@ -36,7 +36,7 @@ class CppAnalyzer:
         use_rag: bool = True
     ) -> AnalysisResult:
         """
-        Analyze a C++ file for style violations
+        Analyze a C++ file for style violations (basic runnable MVP without LLM/RAG).
 
         Args:
             file_content: Source code content
@@ -49,42 +49,23 @@ class CppAnalyzer:
             AnalysisResult with all detected violations
         """
         try:
-            # Step 1: Syntax analysis with tree-sitter
-            syntax_issues = self.tree_sitter_parser.find_syntax_issues(file_content)
+            # Basic, deterministic checks driven by the uploaded style guide
+            violations = self._run_basic_checks(file_content, style_guide)
 
-            # Step 2: Get relevant context from RAG (if enabled)
-            rag_context = None
-            if use_rag:
-                rag_context = self._get_rag_context(file_content)
-
-            # Step 3: Semantic analysis with Ollama
-            semantic_violations = await self.ollama_service.analyze_code(
-                code=file_content,
-                style_guide=style_guide,
-                context=rag_context
-            )
-
-            # Step 4: Merge and structure violations
-            all_violations = self._merge_violations(
-                syntax_issues,
-                semantic_violations
-            )
-
-            # Step 5: Calculate statistics
-            violations_by_severity = self._count_by_severity(all_violations)
-            violations_by_type = self._count_by_type(all_violations)
+            # Stats
+            violations_by_severity = self._count_by_severity(violations)
+            violations_by_type = self._count_by_type(violations)
 
             return AnalysisResult(
                 file_name=file_name,
                 file_path=file_path,
                 timestamp=datetime.now(),
-                violations=all_violations,
-                total_violations=len(all_violations),
+                violations=violations,
+                total_violations=len(violations),
                 violations_by_severity=violations_by_severity,
                 violations_by_type=violations_by_type,
                 status="success"
             )
-
         except Exception as e:
             return AnalysisResult(
                 file_name=file_name,
@@ -127,6 +108,166 @@ class CppAnalyzer:
 
         return violations
 
+    # --- Basic checks (rule-driven) ---
+
+    def _run_basic_checks(self, code: str, style_guide_text: str) -> List[Violation]:
+        """
+        Parse the uploaded style guide and run simple keyword-mapped checks.
+        """
+        rules = self._parse_style_guide_rules(style_guide_text)
+        violations: List[Violation] = []
+
+        for rule in rules:
+            text = self._rule_text(rule)
+            sev = self._rule_severity(rule)
+            check = self._match_rule_to_check_text(text)
+
+            if not check:
+                continue
+
+            for (line, col, msg, vtype) in check(code, text):
+                snippet = self._line_snippet(code, line)
+                violations.append(
+                    Violation(
+                        type=vtype,
+                        severity=sev,
+                        line_number=line,
+                        column=col,
+                        description=msg,
+                        style_guide_reference=self._rule_reference(rule),
+                        code_snippet=snippet
+                    )
+                )
+        return violations
+
+    def _parse_style_guide_rules(self, content: str):
+        """
+        Use StyleGuideProcessor; handle either StyleGuide object or list of rules.
+        """
+        sg = self.style_processor.parse_style_guide(content)
+        # Supports both returns: StyleGuide with .rules or direct list
+        rules = getattr(sg, "rules", sg)
+        return rules or []
+
+    def _rule_text(self, rule) -> str:
+        # Prefer description + name when available
+        name = getattr(rule, "rule_name", None) or getattr(rule, "name", None) or ""
+        desc = getattr(rule, "description", None) or getattr(rule, "text", None) or ""
+        return f"{name} {desc}".strip()
+
+    def _rule_reference(self, rule) -> Optional[str]:
+        # Use rule_name or a section/name-like attribute for reference
+        return getattr(rule, "rule_name", None) or getattr(rule, "name", None)
+
+    def _rule_severity(self, rule) -> ViolationSeverity:
+        sev = getattr(rule, "severity", None)
+        if isinstance(sev, ViolationSeverity):
+            return sev
+        if hasattr(sev, "name"):
+            name = sev.name.upper()
+        elif isinstance(sev, str):
+            name = sev.upper()
+        else:
+            name = "WARNING"
+        return {
+            "CRITICAL": ViolationSeverity.CRITICAL,
+            "WARNING": ViolationSeverity.WARNING,
+            "MINOR": ViolationSeverity.MINOR,
+        }.get(name, ViolationSeverity.WARNING)
+
+    # --- Rule matching by text ---
+
+    def _match_rule_to_check_text(self, text: str) -> Optional[Callable[[str, str], List[Tuple[int, Optional[int], str, str]]]]:
+        low = text.lower()
+
+        if "tab" in low and ("indent" in low or "tabs" in low or "no tab" in low):
+            return self._check_no_tabs
+
+        if "trailing whitespace" in low or "trailing spaces" in low:
+            return self._check_trailing_whitespace
+
+        if "line length" in low or "max line length" in low or "maximum line length" in low:
+            return self._check_line_length
+
+        if ("brace" in low or "braces" in low) and ("same line" in low or "k&r" in low or "opening brace" in low):
+            return self._check_opening_brace_same_line
+
+        if ("file header" in low or "header comment" in low or "file comment" in low):
+            return self._check_file_header_comment
+
+        return None
+
+    # --- Checks (return tuples of (line, col, message, violation_type)) ---
+
+    def _check_no_tabs(self, code: str, _rule_text: str):
+        results = []
+        for idx, line in enumerate(code.splitlines(), start=1):
+            if "\t" in line:
+                results.append((idx, line.find("\t") + 1, "Tabs found; use spaces for indentation", "indentation"))
+        return results
+
+    def _check_trailing_whitespace(self, code: str, _rule_text: str):
+        results = []
+        for idx, line in enumerate(code.splitlines(), start=1):
+            if re.search(r"[ \t]+$", line):
+                results.append((idx, None, "Trailing whitespace detected", "whitespace"))
+        return results
+
+    def _check_line_length(self, code: str, rule_text: str):
+        limit = self._extract_first_int(rule_text) or 100
+        results = []
+        for idx, line in enumerate(code.splitlines(), start=1):
+            if len(line) > limit and "http" not in line:
+                results.append((idx, limit + 1, f"Line exceeds maximum length of {limit} characters", "line_length"))
+        return results
+
+    def _check_opening_brace_same_line(self, code: str, _rule_text: str):
+        results = []
+        lines = code.splitlines()
+        control_re = re.compile(r"^\s*(if|for|while|switch|class|struct|namespace|template|try|catch|do|else|enum)\b.*[^;]$")
+        # fixed truncated regex
+        func_decl_re = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_:<>~\s*&]+)\s+([A-Za-z_][A-Za-z0-9_:<>~]*)\s*\([^;]*\)\s*(const\s*)?(\w*\s*)?$")
+        for i in range(len(lines) - 1):
+            curr = lines[i]
+            nxt = lines[i + 1]
+            if curr.strip().startswith("//") or curr.strip().startswith("/*") or curr.strip().startswith("#"):
+                continue
+            is_header = bool(control_re.match(curr)) or bool(func_decl_re.match(curr))
+            if is_header and "{" not in curr and re.match(r"^\s*{\s*$", nxt):
+                results.append((i + 2, 1, "Opening brace should be on the same line as the declaration/statement", "brace_style"))
+        return results
+
+    def _check_file_header_comment(self, code: str, _rule_text: str):
+        lines = code.splitlines()
+        i = 0
+        n = len(lines)
+        while i < n and lines[i].strip() == "":
+            i += 1
+        if i < n and (lines[i].lstrip().startswith("//") or lines[i].lstrip().startswith("/*")):
+            return []
+        if i < n:
+            return [(i + 1, 1, "Missing file header comment at top of file", "documentation")]
+        return []
+
+    # --- Helpers ---
+
+    def _extract_first_int(self, text: str) -> Optional[int]:
+        m = re.search(r"(\d+)", text)
+        if not m:
+            return None
+        try:
+            return int(m.group(1))
+        except ValueError:
+            return None
+
+    def _line_snippet(self, code: str, line_no: int) -> Optional[str]:
+        try:
+            return code.splitlines()[line_no - 1]
+        except Exception:
+            return None
+
+    # --- Keep existing summary helpers ---
+
     def _count_by_severity(self, violations: List[Violation]) -> dict:
         """Count violations by severity level"""
         counts = {
@@ -134,108 +275,16 @@ class CppAnalyzer:
             "WARNING": 0,
             "MINOR": 0
         }
-
         for v in violations:
-            counts[v.severity.value] += 1
-
+            # v.severity is ViolationSeverity
+            counts[v.severity.value if hasattr(v.severity, "value") else str(v.severity)] += 1
         return counts
 
     def _count_by_type(self, violations: List[Violation]) -> dict:
         """Count violations by type"""
         counts = {}
-
         for v in violations:
             counts[v.type] = counts.get(v.type, 0) + 1
-
         return counts
 
-    def analyze(self, req: AnalysisRequest) -> AnalysisResult:
-        rules = self.style_processor.parse_style_guide(req.style_guide_text)
-        code = req.code
-        violations: List[Violation] = []
-
-        # Map rules to checks by keyword
-        for rule in rules:
-            check = self._match_rule_to_check(rule)
-            if not check:
-                # No automatic check available for this rule in MVP
-                continue
-            found = check(code, rule)
-            if not found:
-                continue
-            for (line, col, msg) in found:
-                violations.append(Violation(
-                    rule_id=rule.id,
-                    severity=rule.severity,
-                    line=line,
-                    column=col,
-                    description=msg,
-                    guide_section=rule.section
-                ))
-
-        summary = {
-            "CRITICAL": sum(1 for v in violations if v.severity == Severity.CRITICAL),
-            "WARNING": sum(1 for v in violations if v.severity == Severity.WARNING),
-            "MINOR": sum(1 for v in violations if v.severity == Severity.MINOR),
-        }
-        return AnalysisResult(
-            file_name=req.filename,
-            violations=violations,
-            summary=summary
-        )
-
-    # --- Rule matching ---
-
-    def _match_rule_to_check(self, rule: StyleGuideRule) -> Optional[Callable[[str, StyleGuideRule], List[Tuple[int, Optional[int], str]]]]:
-        text = rule.text.lower()
-
-        if "tab" in text and ("indent" in text or "tabs" in text or "no tab" in text):
-            return self._check_no_tabs
-
-        if "trailing whitespace" in text or "trailing spaces" in text:
-            return self._check_trailing_whitespace
-
-        if "line length" in text or "max line length" in text or "maximum line length" in text:
-            return self._check_line_length
-
-        if ("brace" in text or "braces" in text) and ("same line" in text or "k&r" in text or "opening brace" in text):
-            return self._check_opening_brace_same_line
-
-        if ("file header" in text or "header comment" in text or "file comment" in text):
-            return self._check_file_header_comment
-
-        # Add more mappings as needed (naming, comment density, etc.)
-        return None
-
-    # --- Checks ---
-
-    def _check_no_tabs(self, code: str, rule: StyleGuideRule):
-        results = []
-        for idx, line in enumerate(code.splitlines(), start=1):
-            if "\t" in line:
-                results.append((idx, line.find("\t") + 1, "Tabs found; use spaces for indentation"))
-        return results
-
-    def _check_trailing_whitespace(self, code: str, rule: StyleGuideRule):
-        results = []
-        for idx, line in enumerate(code.splitlines(), start=1):
-            if line.rstrip("\r\n") != line.rstrip("\r\n ").rstrip("\t"):
-                results.append((idx, None, "Trailing whitespace detected"))
-        return results
-
-    def _check_line_length(self, code: str, rule: StyleGuideRule):
-        # Try to extract a numeric limit from rule text; default to 100
-        limit = self._extract_first_int(rule.text) or 100
-        results = []
-        for idx, line in enumerate(code.splitlines(), start=1):
-            # Ignore URLs to reduce false positives
-            if len(line) > limit and "http" not in line:
-                results.append((idx, limit + 1, f"Line exceeds maximum length of {limit} characters"))
-        return results
-
-    def _check_opening_brace_same_line(self, code: str, rule: StyleGuideRule):
-        # Naive detection for function or control statements with brace on next line
-        results = []
-        lines = code.splitlines()
-        control_re = re.compile(r"^\s*(if|for|while|switch|class|struct|namespace|template|try|catch|do|else|enum)\b.*[^;]$")
-        func_decl_re = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_:<>~\s*&]+)\s+([A-Za
+    # --- Remove conflicting sync analyze(req) path to avoid model mismatches ---
