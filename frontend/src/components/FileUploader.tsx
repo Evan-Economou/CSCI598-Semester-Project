@@ -11,6 +11,7 @@ interface FileUploaderProps {
   uploadedFiles: UploadedFile[];
   selectedFile: UploadedFile | null;
   onFileSelect: (file: UploadedFile) => void;
+  onFileDelete: (fileId: string) => void;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
@@ -18,6 +19,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   uploadedFiles,
   selectedFile,
   onFileSelect,
+  onFileDelete,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,7 +45,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     event.stopPropagation();
     try {
       await api.deleteFile(fileId);
-      // TODO: Update parent state to remove file
+      onFileDelete(fileId);
     } catch (error) {
       console.error('Error deleting file:', error);
     }

@@ -24,6 +24,21 @@ function App() {
     }
   };
 
+  const handleFileDelete = (fileId: string) => {
+    setUploadedFiles(prev => prev.filter(f => {
+      const id = (f as any).id || (f as any).file_id;
+      return id !== fileId;
+    }));
+    // Clear selection if the deleted file was selected
+    if (selectedFile) {
+      const selectedId = (selectedFile as any).id || (selectedFile as any).file_id;
+      if (selectedId === fileId) {
+        setSelectedFile(null);
+        setAnalysisResult(null);
+      }
+    }
+  };
+
   useEffect(() => {
     // Load style guides when Analysis tab is active
     const loadGuides = async () => {
@@ -162,6 +177,7 @@ function App() {
                 uploadedFiles={uploadedFiles}
                 selectedFile={selectedFile}
                 onFileSelect={setSelectedFile}
+                onFileDelete={handleFileDelete}
               />
             </aside>
 
