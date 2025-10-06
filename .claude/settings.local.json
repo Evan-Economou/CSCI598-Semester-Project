@@ -8,7 +8,14 @@
       "Bash(findstr:*)",
       "Bash(npm install)",
       "Bash(npm uninstall:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(python:*)",
+      "Bash(venvScriptspython.exe:*)",
+      "Bash(\"venv/Scripts/python.exe\" -c \"import sys; print(sys.executable)\")",
+      "Bash(\"venv/Scripts/python.exe\" -c \"from app.parsers.cpp_analyzer import CppAnalyzer; print(''Import successful'')\")",
+      "Bash(\"venv/Scripts/python.exe\" test_analysis.py)",
+      "Bash(\"venv/Scripts/python.exe\" -m uvicorn app.main:app --host 127.0.0.1 --port 8000)",
+      "Bash(\"venv/Scripts/python.exe\" test_api.py)"
     ],
     "deny": [],
     "ask": []

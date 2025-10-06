@@ -1427,3 +1427,179 @@ Next Steps
 1. Wire api/analysis.py to invoke CppAnalyzer.analyze with uploaded code and selected style guide.
 2. Add unit tests for style_guide_service and cpp_analyzer checks.
 3. Extend rule-to-check mapping (naming conventions, include guards, spacing rules) and integrate Tree-sitter when ready.
+
+---
+
+## Date: 2025-10-06 (Session 2)
+
+### Session: Complete Backend MVP Analysis Integration
+
+Objective: Wire the analysis endpoint to the working CppAnalyzer and complete the end-to-end MVP backend functionality.
+
+---
+
+### Backend Changes
+
+#### backend/app/models/core.py (MODIFIED)
+**Changes:**
+- Consolidated and standardized all data models to match analyzer expectations
+- Added `ViolationSeverity` as alias for `Severity` for backward compatibility
+- Added `StyleGuideRule` and `StyleGuide` models for style guide parsing
+- Updated `Violation` model with fields: type, severity, line_number, column, description, style_guide_reference, code_snippet
+- Updated `AnalysisRequest` model to accept: file_id, style_guide_id, use_rag
+- Updated `AnalysisResult` model with complete fields: file_name, file_path, timestamp, violations, total_violations, violations_by_severity, violations_by_type, status, error_message
+
+**Reason:**
+- Aligns all models with what CppAnalyzer expects and produces
+- Provides consistent API contracts between frontend and backend
+- Enables proper serialization/deserialization of analysis results
+
+---
+
+#### backend/app/api/analysis.py (IMPLEMENTED)
+**Changes:**
+- Imported CppAnalyzer from app.parsers.cpp_analyzer
+- Imported uploaded_files from app.api.files for file retrieval
+- Imported rag_documents from app.api.rag for style guide retrieval
+- Initialized analyzer instance
+- Implemented `/analyze` endpoint:
+  - Retrieves uploaded file by file_id
+  - Retrieves style guide by style_guide_id
+  - Calls analyzer.analyze_file() with file content and style guide
+  - Returns complete AnalysisResult with violations
+  - Handles errors with proper HTTP exceptions
+- Added response_model=AnalysisResult for API documentation
+
+**Reason:**
+- Connects the working analyzer to the API layer
+- Enables frontend to trigger analysis via API calls
+- Completes the MVP backend analysis pipeline
+- Based on development_plan.md requirements for MVP backend
+
+---
+
+#### backend/app/api/files.py (MODIFIED)
+**Changes:**
+- Updated upload response to include both `id` and `file_id` fields (aliases)
+- Updated upload response to include both `file_name` and `filename` fields (aliases)
+- Updated list_files response to include same field aliases
+
+**Reason:**
+- Ensures compatibility with frontend expectations
+- Frontend components may use either field name
+- Provides flexibility without breaking changes
+
+---
+
+#### backend/app/api/rag.py (MODIFIED)
+**Changes:**
+- Updated upload response to include `id`, `doc_id`, and `document_id` as aliases
+- Updated upload response to include `filename` and `name` as aliases
+- Updated upload response to include `type` and `doc_type` as aliases
+- Updated list_rag_documents response with same field aliases
+
+**Reason:**
+- Ensures compatibility with frontend RAG management
+- Frontend uses different field names in different contexts
+- Maintains backward compatibility while standardizing
+
+---
+
+### Testing
+
+#### backend/test_analysis.py (NEW)
+**Purpose:** Unit test for CppAnalyzer without API layer
+
+**Features:**
+- Tests analyzer directly with sample C++ code
+- Sample code includes brace style violations and missing header comment
+- Sample style guide with CRITICAL/WARNING/MINOR sections
+- Validates violation detection, severity assignment, and statistics
+
+**Results:**
+- Successfully detected 3 violations (2 brace style, 1 documentation)
+- Correct severity mapping (CRITICAL for braces, MINOR for docs)
+- Proper violation type categorization
+
+---
+
+#### backend/test_api.py (NEW)
+**Purpose:** End-to-end integration test via API
+
+**Flow:**
+1. Upload C++ file via `/api/files/upload`
+2. Upload style guide via `/api/rag/upload`
+3. Trigger analysis via `/api/analysis/analyze`
+4. Verify violations are returned correctly
+
+**Results:**
+- Full API flow working end-to-end
+- File upload successful (status 200)
+- Style guide upload successful (status 200)
+- Analysis endpoint returns complete results with violations
+- All violations detected and properly formatted
+
+---
+
+### MVP Backend Completion Summary
+
+**What Now Works:**
+✅ File upload and storage (in-memory)
+✅ Style guide upload and storage (in-memory)
+✅ Style guide parsing (CRITICAL/WARNING/MINOR sections)
+✅ C++ code analysis with rule-based checks:
+   - No tabs for indentation
+   - Trailing whitespace detection
+   - Line length limits
+   - Opening brace on same line (K&R style)
+   - File header comment requirement
+✅ Analysis endpoint fully functional
+✅ Complete AnalysisResult with violations and statistics
+✅ End-to-end API flow tested and working
+
+**Detection Capabilities:**
+- Text-based heuristics for common style violations
+- Severity mapping from style guide sections
+- Line-by-line violation reporting with code snippets
+- Violation categorization by type and severity
+- Summary statistics generation
+
+**API Endpoints Working:**
+- POST /api/files/upload - Upload C++ files
+- GET /api/files/list - List uploaded files
+- GET /api/files/{file_id} - Get file content
+- DELETE /api/files/{file_id} - Delete file
+- POST /api/rag/upload - Upload style guides
+- GET /api/rag/documents - List style guides
+- DELETE /api/rag/documents/{doc_id} - Delete style guide
+- POST /api/analysis/analyze - Analyze code (NEW - WORKING)
+
+**Still TODO (Future Enhancements):**
+- Ollama/LLM integration for semantic analysis
+- Tree-sitter integration for syntax-aware parsing
+- RAG service for context-aware analysis
+- Persistent storage (currently in-memory)
+- Batch file processing
+- WebSocket for progress updates
+
+---
+
+### Notes & Compatibility
+
+- All models aligned between analyzer, API, and frontend
+- Field aliases ensure backward compatibility
+- MVP focuses on deterministic rule-based checks
+- LLM/RAG integration deferred to next phase
+- In-memory storage sufficient for MVP testing
+- Analysis is synchronous (async wrapper for future scalability)
+
+---
+
+### Next Steps
+
+1. Test frontend integration with working backend
+2. Add more rule checks (naming conventions, include guards, etc.)
+3. Implement Ollama service for semantic analysis
+4. Implement RAG service for context-aware checking
+5. Add persistent storage layer
+6. Implement Tree-sitter for syntax tree analysis

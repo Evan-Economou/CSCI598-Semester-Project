@@ -31,9 +31,13 @@ async def upload_rag_document(file: UploadFile = File(...), doc_type: str = "sty
     }
 
     return {
-        "document_id": doc_id,
+        "id": doc_id,
+        "doc_id": doc_id,  # Alias for compatibility
+        "document_id": doc_id,  # Alias for compatibility
         "filename": file.filename,
+        "name": file.filename,  # Alias for compatibility
         "type": doc_type,
+        "doc_type": doc_type,  # Alias for compatibility
         "status": "uploaded"
     }
 
@@ -45,8 +49,11 @@ async def list_rag_documents():
         "documents": [
             {
                 "id": doc_id,
+                "doc_id": doc_id,  # Alias for compatibility
                 "filename": doc["filename"],
-                "type": doc["type"]
+                "name": doc["filename"],  # Alias for compatibility
+                "type": doc["type"],
+                "doc_type": doc["type"]  # Alias for compatibility
             }
             for doc_id, doc in rag_documents.items()
         ]

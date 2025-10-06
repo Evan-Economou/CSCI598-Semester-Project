@@ -52,8 +52,10 @@ async def upload_file(file: UploadFile = File(...)):
     }
 
     return {
-        "file_id": file_id,
+        "id": file_id,
+        "file_id": file_id,  # Alias for compatibility
         "file_name": file.filename,
+        "filename": file.filename,  # Alias for compatibility
         "file_size": len(content),
         "status": "uploaded"
     }
@@ -65,8 +67,10 @@ async def list_files():
     return {
         "files": [
             {
-                "file_id": fid,
+                "id": fid,
+                "file_id": fid,  # Alias for compatibility
                 "file_name": fdata["name"],
+                "filename": fdata["name"],  # Alias for compatibility
                 "file_size": fdata["size"]
             }
             for fid, fdata in uploaded_files.items()

@@ -14,26 +14,51 @@ class Severity(str, Enum):
     MINOR = "MINOR"
 
 
+# Alias for compatibility
+ViolationSeverity = Severity
+
+
+class StyleGuideRule(BaseModel):
+    """Individual style guide rule"""
+    id: str
+    text: str
+    severity: Severity
+    section: str
+
+
+class StyleGuide(BaseModel):
+    """Parsed style guide document"""
+    name: str
+    rules: List[StyleGuideRule]
+    raw_content: str
+
+
 class Violation(BaseModel):
     """Represents a single code style violation"""
-    rule_id: Optional[str] = None
+    type: str = "general"
     severity: Severity
-    line: int
+    line_number: int
     column: Optional[int] = None
     description: str
-    guide_section: Optional[str] = None
+    style_guide_reference: Optional[str] = None
+    code_snippet: Optional[str] = None
 
 
 class AnalysisRequest(BaseModel):
     """Request to analyze a file"""
-    code: str
-    filename: Optional[str] = None
-    style_guide_text: str
+    file_id: str
+    style_guide_id: Optional[str] = None
+    use_rag: bool = False
 
 
 class AnalysisResult(BaseModel):
     """Analysis results for a single file"""
-    file_name: Optional[str] = None
-    analyzed_at: datetime = Field(default_factory=datetime.utcnow)
+    file_name: str
+    file_path: Optional[str] = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
     violations: List[Violation]
-    summary: Dict[str, int]  # counts by severity, e.g., {"CRITICAL": 1, "WARNING": 3, "MINOR": 2}
+    total_violations: int
+    violations_by_severity: Dict[str, int]
+    violations_by_type: Dict[str, int]
+    status: str = "success"
+    error_message: Optional[str] = None
