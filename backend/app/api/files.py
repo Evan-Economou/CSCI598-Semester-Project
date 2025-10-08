@@ -1,8 +1,8 @@
 """
 File upload and management endpoints
 """
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from typing import List
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from typing import List, Optional
 import os
 import uuid
 
@@ -13,10 +13,14 @@ uploaded_files = {}
 
 
 @router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(
+    file: UploadFile = File(...),
+    relative_path: Optional[str] = Form(None)
+):
     """
     Upload a single C++ file for analysis
 
+    Supports both individual file uploads and folder uploads with relative paths.
     Supported extensions: .cpp, .hpp, .h
     """
     # Validate file extension
@@ -43,10 +47,14 @@ async def upload_file(file: UploadFile = File(...)):
     # Generate unique file ID
     file_id = str(uuid.uuid4())
 
+    # Use relative_path if provided, otherwise just use filename
+    display_path = relative_path if relative_path else file.filename
+
     # Store file (in-memory for MVP)
     uploaded_files[file_id] = {
         "id": file_id,
         "name": file.filename,
+        "path": display_path,  # Full path with directory structure
         "content": content.decode("utf-8"),
         "size": len(content)
     }
@@ -56,6 +64,7 @@ async def upload_file(file: UploadFile = File(...)):
         "file_id": file_id,  # Alias for compatibility
         "file_name": file.filename,
         "filename": file.filename,  # Alias for compatibility
+        "file_path": display_path,  # Path with directory structure
         "file_size": len(content),
         "status": "uploaded"
     }
@@ -63,7 +72,7 @@ async def upload_file(file: UploadFile = File(...)):
 
 @router.get("/list")
 async def list_files():
-    """Get list of all uploaded files"""
+    """Get list of all uploaded files with directory structure"""
     return {
         "files": [
             {
@@ -71,6 +80,7 @@ async def list_files():
                 "file_id": fid,  # Alias for compatibility
                 "file_name": fdata["name"],
                 "filename": fdata["name"],  # Alias for compatibility
+                "file_path": fdata.get("path", fdata["name"]),  # Full path with directory
                 "file_size": fdata["size"]
             }
             for fid, fdata in uploaded_files.items()

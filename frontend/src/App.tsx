@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import FileUploader from './components/FileUploader';
 import CodeViewer from './components/CodeViewer';
 import ViolationPanel from './components/ViolationPanel';
-import RAGManager from './components/RAGManager'; // added: render RAG tab content
-import { AnalysisResult, UploadedFile } from './types';
+import RAGManager from './components/RAGManager';
+import { AnalysisResult, UploadedFile, FileTreeNode } from './types';
 import { analyzeCode, listRAGDocuments } from './services/api';
+import { buildFileTree, removeFileFromTree } from './utils/fileTreeUtils';
 
 function App() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -17,10 +18,23 @@ function App() {
   const [analyzing, setAnalyzing] = useState<boolean>(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
+  // Build file tree from flat list
+  const fileTree = useMemo(() => buildFileTree(uploadedFiles), [uploadedFiles]);
+
   const handleFileUpload = (files: UploadedFile[]) => {
     setUploadedFiles(prev => [...prev, ...files]);
     if (files.length > 0 && !selectedFile) {
       setSelectedFile(files[0]);
+    }
+  };
+
+  const handleFileSelect = (node: FileTreeNode) => {
+    if (node.type === 'file' && node.file_id) {
+      // Find the full file object
+      const file = uploadedFiles.find(f => f.file_id === node.file_id);
+      if (file) {
+        setSelectedFile(file);
+      }
     }
   };
 
@@ -174,9 +188,9 @@ function App() {
             <aside className="w-64 bg-gray-800 border-r border-gray-700 overflow-y-auto">
               <FileUploader
                 onFileUpload={handleFileUpload}
-                uploadedFiles={uploadedFiles}
+                fileTree={fileTree}
                 selectedFile={selectedFile}
-                onFileSelect={setSelectedFile}
+                onFileSelect={handleFileSelect}
                 onFileDelete={handleFileDelete}
               />
             </aside>

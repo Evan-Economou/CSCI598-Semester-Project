@@ -33,9 +33,21 @@ export interface AnalysisResult {
 export interface UploadedFile {
   file_id: string;
   file_name: string;
+  file_path?: string;  // Full path with directory structure
   file_size: number;
   content?: string;
   status: string;
+}
+
+// Tree node for hierarchical file display
+export interface FileTreeNode {
+  name: string;
+  path: string;
+  type: 'file' | 'folder';
+  file_id?: string;  // Only for files
+  file_size?: number;  // Only for files
+  children?: FileTreeNode[];  // Only for folders
+  expanded?: boolean;  // UI state for folders
 }
 
 export interface RAGDocument {

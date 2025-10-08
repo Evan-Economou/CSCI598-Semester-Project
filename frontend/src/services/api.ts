@@ -14,9 +14,12 @@ const api = axios.create({
 });
 
 // File upload and management
-export const uploadFile = async (file: File): Promise<UploadedFile> => {
+export const uploadFile = async (file: File, relativePath?: string): Promise<UploadedFile> => {
   const formData = new FormData();
   formData.append('file', file);
+  if (relativePath) {
+    formData.append('relative_path', relativePath);
+  }
 
   const response = await api.post('/files/upload', formData, {
     headers: {

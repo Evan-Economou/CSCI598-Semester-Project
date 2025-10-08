@@ -1,27 +1,29 @@
 /**
- * FileUploader Component - Handle file uploads and display file list
+ * FileUploader Component - Handle file and folder uploads with hierarchical display
  */
 import React, { useRef } from 'react';
-import { Upload, File, X } from 'lucide-react';
-import { UploadedFile } from '../types';
+import { Upload, FolderUp } from 'lucide-react';
+import { UploadedFile, FileTreeNode } from '../types';
 import * as api from '../services/api';
+import FileTree from './FileTree';
 
 interface FileUploaderProps {
   onFileUpload: (files: UploadedFile[]) => void;
-  uploadedFiles: UploadedFile[];
+  fileTree: FileTreeNode[];
   selectedFile: UploadedFile | null;
-  onFileSelect: (file: UploadedFile) => void;
+  onFileSelect: (node: FileTreeNode) => void;
   onFileDelete: (fileId: string) => void;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
   onFileUpload,
-  uploadedFiles,
+  fileTree,
   selectedFile,
   onFileSelect,
   onFileDelete,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -31,7 +33,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 
     for (let i = 0; i < files.length; i++) {
       try {
-        const uploadedFile = await api.uploadFile(files[i]);
+        const file = files[i];
+        // Get relative path from webkitRelativePath if available (folder upload)
+        const relativePath = (file as any).webkitRelativePath || file.name;
+        const uploadedFile = await api.uploadFile(file, relativePath);
         uploadedFilesList.push(uploadedFile);
       } catch (error) {
         console.error(`Error uploading ${files[i].name}:`, error);
@@ -39,6 +44,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     }
 
     onFileUpload(uploadedFilesList);
+
+    // Reset input
+    event.target.value = '';
   };
 
   const handleDelete = async (fileId: string, event: React.MouseEvent) => {
@@ -56,15 +64,26 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       <div className="p-4 border-b border-gray-700">
         <h2 className="text-lg font-semibold mb-3">Files</h2>
 
-        {/* Upload Button */}
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-        >
-          <Upload size={18} />
-          Upload C++ Files
-        </button>
+        {/* Upload Buttons */}
+        <div className="space-y-2">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+          >
+            <Upload size={18} />
+            Upload Files
+          </button>
 
+          <button
+            onClick={() => folderInputRef.current?.click()}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+          >
+            <FolderUp size={18} />
+            Upload Folder
+          </button>
+        </div>
+
+        {/* File input for individual files */}
         <input
           ref={fileInputRef}
           type="file"
@@ -73,41 +92,26 @@ const FileUploader: React.FC<FileUploaderProps> = ({
           onChange={handleFileChange}
           className="hidden"
         />
+
+        {/* Folder input */}
+        <input
+          ref={folderInputRef}
+          type="file"
+          {...({webkitdirectory: "", directory: ""} as any)}
+          multiple
+          onChange={handleFileChange}
+          className="hidden"
+        />
       </div>
 
-      {/* File List */}
-      <div className="flex-1 overflow-y-auto p-2">
-        {uploadedFiles.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8">
-            <p>No files uploaded</p>
-            <p className="text-sm mt-1">Upload .cpp, .hpp, or .h files</p>
-          </div>
-        ) : (
-          <div className="space-y-1">
-            {uploadedFiles.map((file) => (
-              <div
-                key={file.file_id}
-                onClick={() => onFileSelect(file)}
-                className={`flex items-center justify-between p-3 rounded cursor-pointer transition-colors ${
-                  selectedFile?.file_id === file.file_id
-                    ? 'bg-blue-600'
-                    : 'bg-gray-700 hover:bg-gray-600'
-                }`}
-              >
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <File size={16} className="flex-shrink-0" />
-                  <span className="text-sm truncate">{file.file_name}</span>
-                </div>
-                <button
-                  onClick={(e) => handleDelete(file.file_id, e)}
-                  className="p-1 hover:bg-red-600 rounded transition-colors"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* File Tree */}
+      <div className="flex-1 overflow-y-auto">
+        <FileTree
+          tree={fileTree}
+          selectedFile={selectedFile}
+          onFileSelect={onFileSelect}
+          onFileDelete={handleDelete}
+        />
       </div>
     </div>
   );
