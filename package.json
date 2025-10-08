@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "start": "concurrently \"cd frontend && npm start\" \"cd backend && python run.py\"",
+    "dev": "concurrently -n frontend,backend -c blue,green \"cd frontend && npm start\" \"cd backend && python run.py\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}
