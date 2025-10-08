@@ -8,7 +8,6 @@ import { UploadedFile, FileTreeNode } from '../types';
  * Only includes C++ files and their parent directories
  */
 export function buildFileTree(files: UploadedFile[]): FileTreeNode[] {
-  const root: Map<string, FileTreeNode> = new Map();
   const CPP_EXTENSIONS = ['.cpp', '.hpp', '.h'];
 
   // Filter to only C++ files
@@ -17,18 +16,27 @@ export function buildFileTree(files: UploadedFile[]): FileTreeNode[] {
     return CPP_EXTENSIONS.some(ext => fileName.toLowerCase().endsWith(ext));
   });
 
+  // Use a string-keyed map to store all nodes by their full path
+  const nodeMap = new Map<string, FileTreeNode>();
+  const rootNodes: FileTreeNode[] = [];
+
   cppFiles.forEach(file => {
     const filePath = file.file_path || file.file_name;
-    const parts = filePath.split(/[/\\]/); // Split on both / and \
+    const parts = filePath.split(/[/\\]/).filter(p => p.length > 0); // Split and remove empty parts
 
     // Build path from root to file
     let currentPath = '';
-    let currentLevel = root;
 
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       const isLastPart = i === parts.length - 1;
+      const parentPath = currentPath;
       currentPath = currentPath ? `${currentPath}/${part}` : part;
+
+      // Skip if node already exists
+      if (nodeMap.has(currentPath)) {
+        continue;
+      }
 
       if (isLastPart) {
         // This is the file itself
@@ -39,38 +47,43 @@ export function buildFileTree(files: UploadedFile[]): FileTreeNode[] {
           file_id: file.file_id,
           file_size: file.file_size,
         };
-        currentLevel.set(part, fileNode);
+        nodeMap.set(currentPath, fileNode);
+
+        // Add to parent's children or root
+        if (parentPath) {
+          const parent = nodeMap.get(parentPath);
+          if (parent && parent.children) {
+            parent.children.push(fileNode);
+          }
+        } else {
+          rootNodes.push(fileNode);
+        }
       } else {
         // This is a directory
-        if (!currentLevel.has(part)) {
-          const folderNode: FileTreeNode = {
-            name: part,
-            path: currentPath,
-            type: 'folder',
-            children: [],
-          };
-          currentLevel.set(part, folderNode);
+        const folderNode: FileTreeNode = {
+          name: part,
+          path: currentPath,
+          type: 'folder',
+          children: [],
+        };
+        nodeMap.set(currentPath, folderNode);
+
+        // Add to parent's children or root
+        if (parentPath) {
+          const parent = nodeMap.get(parentPath);
+          if (parent && parent.children) {
+            parent.children.push(folderNode);
+          }
+        } else {
+          rootNodes.push(folderNode);
         }
-
-        const folderNode = currentLevel.get(part)!;
-        if (!folderNode.children) {
-          folderNode.children = [];
-        }
-
-        // Create a map for the next level
-        const childrenMap = new Map<string, FileTreeNode>();
-        folderNode.children.forEach(child => {
-          childrenMap.set(child.name, child);
-        });
-
-        currentLevel = childrenMap;
       }
     }
   });
 
-  // Convert map to sorted array
-  const sortNodes = (nodes: Map<string, FileTreeNode>): FileTreeNode[] => {
-    const sorted = Array.from(nodes.values()).sort((a, b) => {
+  // Sort function
+  const sortNodes = (nodes: FileTreeNode[]): FileTreeNode[] => {
+    const sorted = nodes.sort((a, b) => {
       // Folders first, then files
       if (a.type !== b.type) {
         return a.type === 'folder' ? -1 : 1;
@@ -81,19 +94,15 @@ export function buildFileTree(files: UploadedFile[]): FileTreeNode[] {
 
     // Recursively sort children
     sorted.forEach(node => {
-      if (node.type === 'folder' && node.children) {
-        const childrenMap = new Map<string, FileTreeNode>();
-        node.children.forEach(child => {
-          childrenMap.set(child.name, child);
-        });
-        node.children = sortNodes(childrenMap);
+      if (node.type === 'folder' && node.children && node.children.length > 0) {
+        node.children = sortNodes(node.children);
       }
     });
 
     return sorted;
   };
 
-  return sortNodes(root);
+  return sortNodes(rootNodes);
 }
 
 /**

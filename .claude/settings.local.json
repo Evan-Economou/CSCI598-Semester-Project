@@ -15,7 +15,8 @@
       "Bash(\"venv/Scripts/python.exe\" -c \"from app.parsers.cpp_analyzer import CppAnalyzer; print(''Import successful'')\")",
       "Bash(\"venv/Scripts/python.exe\" test_analysis.py)",
       "Bash(\"venv/Scripts/python.exe\" -m uvicorn app.main:app --host 127.0.0.1 --port 8000)",
-      "Bash(\"venv/Scripts/python.exe\" test_api.py)"
+      "Bash(\"venv/Scripts/python.exe\" test_api.py)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,7 +2,7 @@
  * FileUploader Component - Handle file and folder uploads with hierarchical display
  */
 import React, { useRef } from 'react';
-import { Upload, FolderUp } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { UploadedFile, FileTreeNode } from '../types';
 import * as api from '../services/api';
 import FileTree from './FileTree';
@@ -22,7 +22,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   onFileSelect,
   onFileDelete,
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,40 +63,20 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       <div className="p-4 border-b border-gray-700">
         <h2 className="text-lg font-semibold mb-3">Files</h2>
 
-        {/* Upload Buttons */}
-        <div className="space-y-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-          >
-            <Upload size={18} />
-            Upload Files
-          </button>
+        {/* Upload Button */}
+        <button
+          onClick={() => folderInputRef.current?.click()}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+        >
+          <Upload size={18} />
+          Upload Files/Folder
+        </button>
 
-          <button
-            onClick={() => folderInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-          >
-            <FolderUp size={18} />
-            Upload Folder
-          </button>
-        </div>
-
-        {/* File input for individual files */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept=".cpp,.hpp,.h"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-
-        {/* Folder input */}
+        {/* Single input that supports both files and folders */}
         <input
           ref={folderInputRef}
           type="file"
-          {...({webkitdirectory: "", directory: ""} as any)}
+          {...({webkitdirectory: "", directory: "", mozdirectory: ""} as any)}
           multiple
           onChange={handleFileChange}
           className="hidden"

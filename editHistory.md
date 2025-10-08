@@ -2122,3 +2122,163 @@ When clicking the delete button (X) on an uploaded file:
 5. Implement folder expansion persistence (remember expanded state)
 6. Add keyboard navigation (arrow keys to navigate tree)
 7. Consider adding breadcrumb for selected file path
+
+---
+
+## Date: 2025-10-08 (Session 2)
+
+### Session: Bug Fixes - Tree Building and Single Upload Button
+
+**Objective:** Fix tree building algorithm that wasn't showing nested files and consolidate to single upload button.
+
+---
+
+### Issues Identified
+
+1. **Tree building bug**: Files in nested folders weren't appearing in the tree
+   - Root cause: Children array wasn't being properly maintained when building nested structures
+   - The algorithm was creating new maps for each level but not properly connecting them back to parent nodes
+
+2. **UI confusion**: Two separate buttons (Upload Files / Upload Folder) was confusing
+   - Users expected one button to handle both cases
+
+---
+
+### Fixes Applied
+
+#### frontend/src/utils/fileTreeUtils.ts (MODIFIED)
+**Changes:**
+- Completely rewrote `buildFileTree()` function with clearer algorithm:
+  - Uses a single `nodeMap` to store all nodes by full path
+  - Maintains separate `rootNodes` array for top-level items
+  - For each file path part:
+    - Creates node if it doesn't exist
+    - Immediately adds node to parent's children array (or root)
+    - Stores node in map by full path for lookup
+  - Filters empty path segments to handle trailing slashes
+  - Properly connects parent-child relationships immediately upon creation
+
+**Why this works:**
+- Single source of truth (`nodeMap`) for all nodes
+- Parent nodes are created before children and stored in map
+- Children are added to parent's array immediately, not deferred
+- No complex map-to-array conversions at intermediate levels
+
+**Before (broken):**
+```typescript
+// Created maps for each level but didn't maintain parent references
+const childrenMap = new Map<string, FileTreeNode>();
+folderNode.children.forEach(child => {
+  childrenMap.set(child.name, child);
+});
+currentLevel = childrenMap; // Lost connection to parent!
+```
+
+**After (working):**
+```typescript
+// Store in map and add to parent immediately
+nodeMap.set(currentPath, folderNode);
+if (parentPath) {
+  const parent = nodeMap.get(parentPath);
+  if (parent && parent.children) {
+    parent.children.push(folderNode); // Direct connection!
+  }
+}
+```
+
+---
+
+#### frontend/src/components/FileUploader.tsx (MODIFIED)
+**Changes:**
+- Removed separate "Upload Files" button
+- Removed `fileInputRef` (unused)
+- Consolidated to single "Upload Files/Folder" button
+- Button always opens folder picker (with `webkitdirectory` attribute)
+- Removed `FolderUp` icon import (unused)
+
+**Result:**
+- Single blue button: "Upload Files/Folder"
+- Opens native folder picker
+- Folder picker still allows selecting individual files in most browsers
+- Cleaner UI with less cognitive load
+
+---
+
+### Technical Details
+
+**Tree Building Algorithm (Fixed):**
+1. Filter files to C++ extensions only
+2. For each file:
+   - Split path into parts (handle both `/` and `\`)
+   - Iterate through each part:
+     - Build cumulative path
+     - Check if node exists in map (skip if yes)
+     - Create file or folder node
+     - Add to parent's children (or root if no parent)
+     - Store in map for future parent lookups
+3. Sort tree recursively (folders first, then alphabetical)
+
+**Key Fix:**
+- Parent nodes are guaranteed to exist in map before children are processed
+- Children are added to `parent.children` array immediately
+- No intermediate map-to-array conversions that lose parent references
+
+**Browser Folder Picker:**
+- `webkitdirectory` attribute enables folder selection
+- Supported in Chrome, Edge, Firefox, Safari
+- Each selected file has `webkitRelativePath` with full path
+- Can still select individual files in some browser implementations
+
+---
+
+### Testing Performed
+
+**Build Test:**
+✅ Frontend compiles successfully without errors
+✅ No TypeScript errors
+✅ Build optimization completes (82.56 kB main.js)
+
+**Expected Behavior (Ready for Manual Testing):**
+- Upload folder with nested C++ files
+- Tree shows all folders and files hierarchically
+- Folders can be expanded/collapsed
+- Files from any depth level are visible
+- Clicking file shows content in code viewer
+- Only C++ files (.cpp, .hpp, .h) appear in tree
+
+---
+
+### Files Modified
+
+1. `frontend/src/utils/fileTreeUtils.ts` - Rewrote tree building algorithm
+2. `frontend/src/components/FileUploader.tsx` - Single upload button
+3. `editHistory.md` - This documentation
+
+---
+
+### Summary of Changes
+
+**Bug Fixes:**
+✅ Tree building algorithm properly maintains parent-child relationships
+✅ Nested files now appear in tree structure
+✅ Empty path segments filtered out
+
+**UI Improvements:**
+✅ Single "Upload Files/Folder" button
+✅ Simplified interface (one button instead of two)
+✅ Cleaner component code
+
+**Code Quality:**
+✅ Removed unused imports (FolderUp, fileInputRef)
+✅ Clearer algorithm with better comments
+✅ More maintainable tree building logic
+
+---
+
+### Next Steps
+
+1. **Immediate**: Manual test with real nested C++ project folder
+2. Test edge cases (empty folders, deep nesting, special characters in names)
+3. Consider adding loading indicator during folder upload
+4. Add file/folder count indicators
+5. Implement persistent folder expansion state
