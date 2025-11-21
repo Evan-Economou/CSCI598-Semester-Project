@@ -1,8 +1,34 @@
 """
 Convenience script to run the backend server
 """
-import uvicorn
 import os
+
+try:
+    import uvicorn
+except ModuleNotFoundError:
+    import sys
+    import subprocess
+    print("\nERROR: Failed to import 'uvicorn'. Diagnostic information:\n")
+    print(f"Python executable: {sys.executable}")
+    print(f"Python version: {sys.version}\n")
+    print("sys.path:")
+    for p in sys.path:
+        print(f"  {p}")
+    print("\nContents of backend/venv/bin (first 40 entries):")
+    try:
+        for i, name in enumerate(sorted(os.listdir(os.path.join(os.path.dirname(__file__), '..', 'venv', 'bin')))):
+            if i >= 40:
+                break
+            print(f"  {name}")
+    except Exception:
+        pass
+    print("\nInstalled packages (via pip):")
+    try:
+        out = subprocess.check_output([sys.executable, "-m", "pip", "list"], text=True)
+        print(out)
+    except Exception as e:
+        print(f"  (failed to run pip list: {e})")
+    raise
 
 if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
