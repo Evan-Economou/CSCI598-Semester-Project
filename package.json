@@ -1,7 +1,10 @@
 {
   "scripts": {
-    "start": "concurrently \"cd frontend && npm start\" \"cd backend && python3.11 run.py\"",
-    "dev": "concurrently -n frontend,backend -c blue,green \"cd frontend && npm start\" \"cd backend && python3.11 run.py\""
+    "start": "concurrently \"cd frontend && npm start\" \"npm run start:backend\"",
+    "start:backend:win": "cd backend && venv\\Scripts\\python.exe run.py",
+    "start:backend:unix": "cd backend && venv/bin/python run.py",
+    "start:backend": "node -e \"process.platform === 'win32' ? process.exit(1) : process.exit(0)\" && npm run start:backend:unix || npm run start:backend:win",
+    "dev": "concurrently -n frontend,backend -c blue,green \"cd frontend && npm start\" \"npm run start:backend\""
   },
   "devDependencies": {
     "concurrently": "^8.0.0"
