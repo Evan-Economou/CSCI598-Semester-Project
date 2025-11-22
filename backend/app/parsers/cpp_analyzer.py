@@ -36,7 +36,7 @@ class CppAnalyzer:
         use_rag: bool = True
     ) -> AnalysisResult:
         """
-        Analyze a C++ file for style violations (basic runnable MVP without LLM/RAG).
+        Analyze a C++ file for style violations using both rule-based and LLM analysis.
 
         Args:
             file_content: Source code content
@@ -49,24 +49,40 @@ class CppAnalyzer:
             AnalysisResult with all detected violations
         """
         try:
-            # Basic, deterministic checks driven by the uploaded style guide
-            violations = self._run_basic_checks(file_content, style_guide)
+            # 1. Run basic rule-based checks (fast, deterministic)
+            basic_violations = self._run_basic_checks(file_content, style_guide)
 
-            # Stats
-            violations_by_severity = self._count_by_severity(violations)
-            violations_by_type = self._count_by_type(violations)
+            # 2. Get RAG context if enabled (for future enhancement)
+            rag_context = None
+            if use_rag:
+                rag_context = self._get_rag_context(file_content)
+
+            # 3. Run LLM analysis (semantic, context-aware)
+            llm_violations = await self.ollama_service.analyze_code(
+                code=file_content,
+                style_guide=style_guide,
+                context=rag_context
+            )
+
+            # 4. Merge violations from both sources (deduplicate similar ones)
+            all_violations = self._merge_violations_smart(basic_violations, llm_violations)
+
+            # 5. Calculate statistics
+            violations_by_severity = self._count_by_severity(all_violations)
+            violations_by_type = self._count_by_type(all_violations)
 
             return AnalysisResult(
                 file_name=file_name,
                 file_path=file_path,
                 timestamp=datetime.now(),
-                violations=violations,
-                total_violations=len(violations),
+                violations=all_violations,
+                total_violations=len(all_violations),
                 violations_by_severity=violations_by_severity,
                 violations_by_type=violations_by_type,
                 status="success"
             )
         except Exception as e:
+            print(f"Analysis error: {e}")
             return AnalysisResult(
                 file_name=file_name,
                 file_path=file_path,
@@ -80,33 +96,53 @@ class CppAnalyzer:
             )
 
     def _get_rag_context(self, code: str) -> Optional[str]:
-        """Retrieve relevant context from RAG system"""
+        """
+        Retrieve relevant context from RAG system
+        
+        NOTE: This is a placeholder for future RAG integration.
+        When implemented, this will:
+        1. Extract key code patterns/constructs from the code
+        2. Query RAG database for relevant style guide sections
+        3. Return focused context to enhance LLM analysis
+        """
         # TODO: Implement RAG context retrieval
-        # Use code snippets as queries to find relevant style guide sections
+        # Example future implementation:
+        # - Extract function signatures, class definitions
+        # - Query ChromaDB for similar examples
+        # - Return relevant style guide excerpts
         return None
 
-    def _merge_violations(
+    def _merge_violations_smart(
         self,
-        syntax_issues: List[dict],
-        semantic_violations: dict
+        basic_violations: List[Violation],
+        llm_violations: List[Violation]
     ) -> List[Violation]:
-        """Merge violations from different sources"""
-        violations = []
-
-        # Convert syntax issues to Violation objects
-        for issue in syntax_issues:
-            violations.append(
-                Violation(
-                    type=issue.get('type', 'syntax_error'),
-                    severity=ViolationSeverity.CRITICAL,
-                    line_number=issue.get('line', 0),
-                    description=issue.get('message', 'Unknown syntax error')
-                )
-            )
-
-        # TODO: Parse and add semantic violations from LLM response
-
-        return violations
+        """
+        Intelligently merge violations from rule-based and LLM analysis.
+        Deduplicates violations that refer to the same issue.
+        """
+        merged = list(basic_violations)  # Start with all basic violations
+        
+        # Track which lines already have violations
+        existing_line_types = {}
+        for v in basic_violations:
+            key = (v.line_number, v.type)
+            existing_line_types[key] = True
+        
+        # Add LLM violations if they're not duplicates
+        for llm_v in llm_violations:
+            key = (llm_v.line_number, llm_v.type)
+            
+            # Only add if this line+type combo doesn't exist
+            # This prevents duplicate detections of the same issue
+            if key not in existing_line_types:
+                merged.append(llm_v)
+                existing_line_types[key] = True
+        
+        # Sort by line number for easier reading
+        merged.sort(key=lambda v: v.line_number)
+        
+        return merged
 
     # --- Basic checks (rule-driven) ---
 

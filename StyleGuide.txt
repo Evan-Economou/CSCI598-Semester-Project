@@ -1,0 +1,19 @@
+MODERATE:
+- Missing header guards
+- Using namespace in a header file
+- Including a library multiple times 
+- Absolutely no comments whatsoever
+- Executable is not the name of the assignment (main.exe, HelloWorld.exe, etc.)
+- Using .hpp instead of .h
+	
+MAJOR:
+- No indentation
+- Inconsistent indentation 
+- Memory leaks
+- Using global variables for no reason (the main exception is with Mersenne Twisters)
+	
+NOT VIOLATIONS:
+- Not using lowerSnakeCase/upperSnakeCase for variables/consts
+- Function parameters not being const (unless specified in rubric)
+- Any amount of comments besides 0
+- A globally declared Mersenne Twister
