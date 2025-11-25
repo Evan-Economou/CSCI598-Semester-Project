@@ -1,67 +1,568 @@
-[1] UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
-[1] INFO:     127.0.0.1:50896 - "GET /api/files/289ff8b2-e3d0-470d-83c5-f0a9d2989e8a HTTP/1.1" 200 OK
-[1] INFO:     127.0.0.1:50896 - "GET /api/rag/documents HTTP/1.1" 200 OK
-[1] INFO:     127.0.0.1:50896 - "GET /api/files/289ff8b2-e3d0-470d-83c5-f0a9d2989e8a HTTP/1.1" 200 OK
-[1] INFO:     127.0.0.1:61957 - "GET /api/rag/documents HTTP/1.1" 200 OK
-[1] INFO:     127.0.0.1:61957 - "GET /api/rag/documents HTTP/1.1" 200 OK
+> start
+> concurrently "cd frontend && npm start" "npm run start:backend"
+
+[1]
+[1] > start:backend
+[1] > node -e "process.platform === 'win32' ? process.exit(1) : process.exit(0)" && npm run start:backend:unix || npm run start:backend:win
+[1]
+[0]
+[0] > frontend@0.1.0 start
+[0] > react-scripts start
+[0]
+[1]
+[1] > start:backend:win
+[1] > cd backend && python.exe run.py
+[1]
+[1] INFO:     Will watch for changes in these directories: ['C:\\Users\\radio\\OneDrive\\Desktop\\Code\\CSCI 598 (LLM Development)\\CSCI598-Semester-Project\\backend']
+[1] INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+[1] INFO:     Started reloader process [18736] using WatchFiles
+[0] (node:25984) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[0] (Use `node --trace-deprecation ...` to show where the warning was created)
+[0] (node:25984) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[0] Starting the development server...
+[0]
+[0] Compiled successfully!
+[0]
+[0] You can now view frontend in the browser.
+[0]
+[0]   Local:            http://localhost:3000
+[0]   On Your Network:  http://10.171.167.36:3000
+[0]
+[0] Note that the development build is not optimized.
+[0] To create a production build, use npm run build.
+[0]
+[0] webpack compiled successfully
+[0] Files successfully emitted, waiting for typecheck results...
+[0] Issues checking in progress...
+[0] No issues found.
+[1] Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+[1] Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+[1] Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+[1] Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+[1] INFO:     Started server process [5316]
+[1] INFO:     Waiting for application startup.
+[1] INFO:     Application startup complete.
+[1] INFO:     127.0.0.1:59729 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:59729 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1] Failed to send telemetry event CollectionAddEvent: capture() takes 1 positional argument but 3 were given
 [1]
 [1] ============================================================
 [1] Adding document to RAG database
-[1] Document ID: 4c67c0a1-db50-4be3-bfa0-40b4c8433246
+[1] Document ID: 95b1388c-08fa-4340-b34f-751bb1ad4c9d
 [1] Type: style_guide
-[1] Content length: 4416 chars
-[1] Metadata: {'filename': 'style_guide.txt'}
+[1] Content length: 7057 chars
+[1] Metadata: {'filename': 'semantic_style_guide.txt'}
 [1] ============================================================
 [1]
 [1] Step 1: Chunking document...
-[1] INFO:     127.0.0.1:61957 - "POST /api/rag/upload?doc_type=style_guide HTTP/1.1" 500 Internal Server Error
-[1] ERROR:    Exception in ASGI application
-[1] Traceback (most recent call last):
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 426, in run_asgi
-[1]     result = await app(  # type: ignore[func-returns-value]
-[1]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 84, in __call__
-[1]     return await self.app(scope, receive, send)
-[1]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\applications.py", line 1106, in __call__
-[1]     await super().__call__(scope, receive, send)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\applications.py", line 122, in __call__
-[1]     await self.middleware_stack(scope, receive, send)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 184, in __call__
-[1]     raise exc
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 162, in __call__
-[1]     await self.app(scope, receive, _send)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 91, in __call__
-[1]     await self.simple_response(scope, receive, send, request_headers=headers)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 146, in simple_response
-[1]     await self.app(scope, receive, send)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 79, in __call__
-[1]     raise exc
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 68, in __call__
-[1]     await self.app(scope, receive, sender)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 20, in __call__
-[1]     raise e
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 17, in __call__
-[1]     await self.app(scope, receive, send)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\routing.py", line 718, in __call__
-[1]     await route.handle(scope, receive, send)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\routing.py", line 276, in handle
-[1]     await self.app(scope, receive, send)
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\routing.py", line 66, in app
-[1]     response = await func(request)
-[1]                ^^^^^^^^^^^^^^^^^^^
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\routing.py", line 274, in app
-[1]     raw_response = await run_endpoint_function(
-[1]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\routing.py", line 191, in run_endpoint_function
-[1]     return await dependant.call(**values)
-[1]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\app\api\rag.py", line 27, in upload_rag_document
-[1]     doc_id = rag_service.add_document(
-[1]              ^^^^^^^^^^^^^^^^^^^^^^^^^
-[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\app\services\rag_service.py", line 66, in add_document
-[1]     print(f"\u2713 Created {len(chunks)} chunks")
-[1]   File "C:\Users\radio\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py", line 19, in encode
-[1]     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-[1]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[1] UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
+[1] [OK] Created 20 chunks
+[1] Step 2: Generating embeddings...
+[1] [OK] Generated 20 embeddings
+[1] Step 3: Preparing metadata...
+[1] Step 4: Storing in ChromaDB...
+[1] [OK] Successfully added document 95b1388c-08fa-4340-b34f-751bb1ad4c9d to RAG database
+[1] ============================================================
+[1]
+[1] INFO:     127.0.0.1:55606 - "POST /api/rag/upload?doc_type=style_guide HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:55606 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:55606 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:55606 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "POST /api/files/upload HTTP/1.1" 400 Bad Request
+[1] INFO:     127.0.0.1:50277 - "GET /api/files/b7862ec9-f789-4e3b-b32b-566c5db22da5 HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "GET /api/files/3975b44d-a10d-4fa8-b524-4678b969af15 HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50277 - "GET /api/files/b7862ec9-f789-4e3b-b32b-566c5db22da5 HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:57116 - "GET /api/files/3975b44d-a10d-4fa8-b524-4678b969af15 HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:57116 - "OPTIONS /api/analysis/analyze HTTP/1.1" 200 OK
+[1]
+[1] ============================================================
+[1] Starting analysis for: 1P-Sorting/sorter.h
+[1] File size: 1732 characters
+[1] ============================================================
+[1]
+[1] Step 1: Running built-in algorithmic checks...
+[1]   - Consistent indentation (tabs/spaces)
+[1]   - Line length (<200 chars)
+[1]   - Consistent brace placement
+[1]   - Single-line if statements
+[1]   - File header comment
+[1]   - Comment frequency
+[1]   - No comments check (CRITICAL)
+[1] Error during analysis: CppAnalyzer._check_line_length() got an unexpected keyword argument 'max_length'
+[1] INFO:     127.0.0.1:57116 - "POST /api/analysis/analyze HTTP/1.1" 200 OK

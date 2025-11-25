@@ -52,26 +52,39 @@ class CppAnalyzer:
             print(f"\n{'='*60}")
             print(f"Starting analysis for: {file_name}")
             print(f"File size: {len(file_content)} characters")
-            print(f"Use RAG: {use_rag}")
             print(f"{'='*60}\n")
 
-            # Basic, deterministic checks driven by the uploaded style guide
-            print("Step 1: Running basic rule-based checks...")
+            # Built-in algorithmic checks (always run)
+            print("Step 1: Running built-in algorithmic checks...")
+            print("  - Consistent indentation (tabs/spaces)")
+            print("  - Line length (<200 chars)")
+            print("  - Consistent brace placement")
+            print("  - Single-line if statements")
+            print("  - File header comment")
+            print("  - Comment frequency")
+            print("  - No comments check (CRITICAL)")
             violations = self._run_basic_checks(file_content, style_guide)
-            print(f"[OK] Found {len(violations)} violations from rule-based checks")
+            print(f"[OK] Found {len(violations)} formatting/documentation violations")
 
-            # If RAG is enabled, use LLM for additional semantic analysis
+            # If RAG is enabled, use LLM for semantic analysis
             if use_rag:
-                print("\nStep 2: RAG is enabled, retrieving context...")
+                print("\nStep 2: LLM Semantic Analysis (using uploaded semantic style guide)...")
+                print("  Searching for semantic issues:")
+                print("  - Memory leaks")
+                print("  - Naming conventions")
+                print("  - Magic numbers")
+                print("  - Code structure issues")
+                print("  - Modern C++ best practices")
+
                 # Get relevant context from RAG
                 rag_context = self._get_rag_context(file_content, style_guide)
                 if rag_context:
                     print(f"[OK] Retrieved RAG context ({len(rag_context)} characters)")
                 else:
-                    print("[WARN] No RAG context found (vector database may be empty)")
+                    print("[WARN] No semantic style guide uploaded - upload semantic_style_guide.txt in RAG Management")
 
-                print("\nStep 3: Calling Ollama/CodeLlama for semantic analysis...")
-                print("[WAIT] This may take 30-60 seconds depending on code complexity...")
+                print("\n  -> Calling Ollama/CodeLlama for semantic analysis...")
+                print("  [WAIT] This may take 30-60 seconds depending on code complexity...")
                 # Analyze with Ollama using RAG context
                 llm_result = await self.ollama_service.analyze_code(
                     code=file_content,
@@ -81,21 +94,22 @@ class CppAnalyzer:
 
                 # Merge LLM violations with rule-based violations
                 if llm_result.get("status") == "success" and llm_result.get("violations"):
-                    print(f"[OK] LLM analysis complete")
+                    print(f"[OK] LLM semantic analysis complete")
                     llm_violations = self._convert_llm_violations(llm_result["violations"])
-                    print(f"[OK] Found {len(llm_violations)} violations from LLM analysis")
+                    print(f"[OK] Found {len(llm_violations)} semantic violations from LLM")
                     violations.extend(llm_violations)
                 elif llm_result.get("status") == "error":
                     print(f"[ERROR] LLM analysis failed: {llm_result.get('error', 'Unknown error')}")
                 else:
-                    print("[WARN] LLM returned no violations")
+                    print("[WARN] LLM returned no semantic violations")
             else:
-                print("\nStep 2: RAG disabled, skipping LLM analysis")
+                print("\nStep 2: RAG disabled, skipping semantic LLM analysis")
 
             # Remove duplicate violations (same line and type)
-            print(f"\nStep 4: Deduplicating violations...")
+            print(f"\nStep 3: Deduplicating violations...")
             violations = self._deduplicate_violations(violations)
             print(f"[OK] Final violation count: {len(violations)}")
+            print(f"{'='*60}\n")
 
             # Stats
             violations_by_severity = self._count_by_severity(violations)
@@ -198,36 +212,222 @@ class CppAnalyzer:
 
         return violations
 
-    # --- Basic checks (rule-driven) ---
+    # --- Built-in algorithmic checks (always run) ---
 
     def _run_basic_checks(self, code: str, style_guide_text: str) -> List[Violation]:
         """
-        Parse the uploaded style guide and run simple keyword-mapped checks.
+        Run built-in algorithmic formatting checks.
+        These checks always run regardless of uploaded style guide.
         """
-        rules = self._parse_style_guide_rules(style_guide_text)
         violations: List[Violation] = []
+        lines = code.split('\n')
 
-        for rule in rules:
-            text = self._rule_text(rule)
-            sev = self._rule_severity(rule)
-            check = self._match_rule_to_check_text(text)
+        # 1. Check for consistent indentation
+        violations.extend(self._check_consistent_indentation(lines))
 
-            if not check:
+        # 2. Check for extremely long lines (>200 chars)
+        violations.extend(self._check_line_length(lines, 200))
+
+        # 3. Check for consistent brace placement
+        violations.extend(self._check_consistent_braces(lines))
+
+        # 4. Check for single-line if statements without braces
+        violations.extend(self._check_single_line_if_statements(lines))
+
+        # 5. Check for file header comment
+        violations.extend(self._check_file_header_comment(lines))
+
+        # 6. Check comment frequency (every 20 lines)
+        violations.extend(self._check_comment_frequency(lines))
+
+        # 7. CRITICAL: Check if file has NO comments at all
+        violations.extend(self._check_no_comments(lines))
+
+        return violations
+
+    def _check_consistent_indentation(self, lines: List[str]) -> List[Violation]:
+        """Check for consistent indentation (tabs OR spaces, but consistent)"""
+        violations = []
+        uses_tabs = None
+        uses_spaces = None
+
+        for i, line in enumerate(lines, 1):
+            if not line.strip():  # Skip empty lines
                 continue
 
-            for (line, col, msg, vtype) in check(code, text):
-                snippet = self._line_snippet(code, line)
-                violations.append(
-                    Violation(
-                        type=vtype,
-                        severity=sev,
-                        line_number=line,
-                        column=col,
-                        description=msg,
-                        style_guide_reference=self._rule_reference(rule),
-                        code_snippet=snippet
-                    )
-                )
+            # Get leading whitespace
+            leading = len(line) - len(line.lstrip())
+            if leading == 0:
+                continue
+
+            # Check what type of indentation is used
+            if line[0] == '\t':
+                uses_tabs = True
+            elif line[0] == ' ':
+                uses_spaces = True
+
+            # If mixing tabs and spaces, that's a violation
+            if uses_tabs and uses_spaces:
+                violations.append(Violation(
+                    type="inconsistent_indentation",
+                    severity=ViolationSeverity.WARNING,
+                    line_number=i,
+                    description="File mixes tabs and spaces for indentation. Use one consistently.",
+                    rule_reference="Consistent Indentation",
+                    code_snippet=line.rstrip()
+                ))
+                break  # Only report once
+
+        return violations
+
+    def _check_line_length(self, lines: List[str], max_length: int) -> List[Violation]:
+        """Check for extremely long lines (>200 chars)"""
+        violations = []
+
+        for i, line in enumerate(lines, 1):
+            if len(line) > max_length:
+                violations.append(Violation(
+                    type="line_too_long",
+                    severity=ViolationSeverity.MINOR,
+                    line_number=i,
+                    description=f"Line is {len(line)} characters long (exceeds {max_length} character limit)",
+                    rule_reference="Maximum Line Length",
+                    code_snippet=line[:100] + "..." if len(line) > 100 else line
+                ))
+
+        return violations
+
+    def _check_consistent_braces(self, lines: List[str]) -> List[Violation]:
+        """Check that opening braces are placed consistently (same line OR next line, not mixed)"""
+        violations = []
+        same_line_count = 0
+        next_line_count = 0
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Check for function/control structure followed by brace on same line
+            if re.search(r'(if|else|for|while|switch|class|struct)\s*\([^)]*\)\s*\{', stripped) or \
+               re.search(r'(class|struct)\s+\w+\s*\{', stripped):
+                same_line_count += 1
+
+            # Check for standalone opening brace (next line style)
+            if stripped == '{' and i > 1:
+                prev_line = lines[i-2].strip()
+                if re.search(r'(if|else|for|while|switch|class|struct)', prev_line):
+                    next_line_count += 1
+
+        # If mixing both styles significantly, report it
+        if same_line_count > 0 and next_line_count > 0:
+            violations.append(Violation(
+                type="inconsistent_brace_placement",
+                severity=ViolationSeverity.MINOR,
+                line_number=1,
+                description=f"File uses both same-line ({same_line_count}) and next-line ({next_line_count}) brace placement. Use one style consistently.",
+                rule_reference="Consistent Brace Placement"
+            ))
+
+        return violations
+
+    def _check_single_line_if_statements(self, lines: List[str]) -> List[Violation]:
+        """Check for single-line if statements without braces"""
+        violations = []
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Match if/for/while without braces on same line or next line
+            if re.match(r'^\s*(if|for|while)\s*\([^)]+\)\s*[^{;]', line):
+                # Check if next line has a brace
+                if i < len(lines):
+                    next_stripped = lines[i].strip()
+                    if next_stripped and not next_stripped.startswith('{'):
+                        violations.append(Violation(
+                            type="missing_braces",
+                            severity=ViolationSeverity.WARNING,
+                            line_number=i,
+                            description="Control structure should use braces even for single statements",
+                            rule_reference="Always Use Braces",
+                            code_snippet=stripped
+                        ))
+
+        return violations
+
+    def _check_file_header_comment(self, lines: List[str]) -> List[Violation]:
+        """Check for file header comment in first 10 lines"""
+        violations = []
+        has_header_comment = False
+
+        for i in range(min(10, len(lines))):
+            line = lines[i].strip()
+            if line.startswith('//') or line.startswith('/*') or line.startswith('*'):
+                has_header_comment = True
+                break
+
+        if not has_header_comment:
+            violations.append(Violation(
+                type="missing_file_header",
+                severity=ViolationSeverity.MINOR,
+                line_number=1,
+                description="File should have a header comment describing its purpose",
+                rule_reference="File Header Comment"
+            ))
+
+        return violations
+
+    def _check_comment_frequency(self, lines: List[str]) -> List[Violation]:
+        """Check that there's at least one comment every 20 lines of code"""
+        violations = []
+        code_lines = 0
+        last_comment_line = 0
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Skip empty lines
+            if not stripped:
+                continue
+
+            # Check if this is a comment
+            if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*'):
+                last_comment_line = i
+                code_lines = 0  # Reset counter
+            else:
+                code_lines += 1
+
+                # If we have 20 lines of code without a comment, flag it
+                if code_lines >= 20:
+                    violations.append(Violation(
+                        type="insufficient_comments",
+                        severity=ViolationSeverity.MINOR,
+                        line_number=i,
+                        description=f"No comments found in the last 20 lines of code (since line {last_comment_line})",
+                        rule_reference="Comment Frequency"
+                    ))
+                    code_lines = 0  # Reset to avoid repeated violations
+
+        return violations
+
+    def _check_no_comments(self, lines: List[str]) -> List[Violation]:
+        """CRITICAL: Check if file has NO comments at all"""
+        violations = []
+        has_any_comment = False
+
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*'):
+                has_any_comment = True
+                break
+
+        if not has_any_comment:
+            violations.append(Violation(
+                type="no_comments",
+                severity=ViolationSeverity.CRITICAL,
+                line_number=1,
+                description="File contains NO comments. Code must be documented for maintainability.",
+                rule_reference="Code Documentation"
+            ))
+
         return violations
 
     def _parse_style_guide_rules(self, content: str):
