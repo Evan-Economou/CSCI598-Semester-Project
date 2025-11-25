@@ -162,39 +162,72 @@ class OllamaService:
     ) -> str:
         """Construct the prompt for code analysis"""
 
-        base_prompt = f"""You are a C++ code style analyzer. Analyze the following code against the provided style guide.
+        base_prompt = f"""You are a C++ semantic code analyzer. Your task is to find SEMANTIC and LOGIC issues in the code.
 
-Style Guide:
+IMPORTANT INSTRUCTIONS:
+1. ONLY check for semantic issues (memory management, naming conventions, logic errors, code structure)
+2. DO NOT check for formatting issues (tabs/spaces, line length, brace placement, trailing whitespace) - these are handled by automated tools
+3. Find ALL instances of each violation type, not just the first one
+4. Report ONLY actual code lines - DO NOT report comment lines or blank lines
+5. Be precise with line numbers - count from line 1 at the top of the file
+
+Style Guide (focus on semantic rules only):
 {style_guide}
 
 """
         if context:
-            base_prompt += f"""Additional Context:
+            base_prompt += f"""Additional Context from Knowledge Base:
 {context}
 
 """
 
-        base_prompt += f"""Code to Analyze:
-{code}
+        # Add line numbers to code for better accuracy
+        numbered_lines = []
+        for i, line in enumerate(code.split('\n'), 1):
+            numbered_lines.append(f"{i:4d} | {line}")
+        numbered_code = '\n'.join(numbered_lines)
 
-Please identify all style violations. For each violation, provide:
-1. Type of violation
-2. Severity (CRITICAL, WARNING, or MINOR)
-3. Line number
-4. Description
-5. Reference to the style guide section
+        base_prompt += f"""Code to Analyze (with line numbers):
+{numbered_code}
 
-Format your response as a JSON array with this structure:
+FOCUS YOUR ANALYSIS ON:
+- Memory leaks (unmatched new/delete, malloc/free)
+- Naming conventions (camelCase for functions, PascalCase for classes)
+- Use of magic numbers (hardcoded numbers without named constants)
+- Missing const correctness
+- Shadowing variables
+- Missing default cases in switch statements
+- Use of nullptr vs NULL
+- Deep nesting (more than 3 levels)
+- Function length (over 50 lines)
+- Missing include guards
+- Memory management issues
+
+DO NOT REPORT:
+- Tabs vs spaces
+- Line length
+- Brace placement
+- Trailing whitespace
+- Indentation issues
+
+For each violation found:
+1. Type: Brief name of the violation (e.g., "magic_number", "memory_leak", "naming_convention")
+2. Severity: CRITICAL (memory issues, undefined behavior), WARNING (style, best practices), or MINOR (suggestions)
+3. Line number: The EXACT line number from the numbered code above (look at the number before the |)
+4. Description: Clear explanation of the violation
+5. Rule reference: Which style guide rule this violates
+
+Format your response as a JSON array:
 [
   {{
     "type": "violation_type",
     "severity": "CRITICAL|WARNING|MINOR",
-    "line_number": 1,
-    "description": "Description of the violation",
-    "rule_reference": "Style guide section reference"
+    "line_number": 42,
+    "description": "Detailed description of the violation",
+    "rule_reference": "Style guide rule name"
   }}
 ]
 
-Only return the JSON, no other text."""
+IMPORTANT: Find ALL instances of each violation, not just examples. Only return the JSON array, no other text."""
 
         return base_prompt

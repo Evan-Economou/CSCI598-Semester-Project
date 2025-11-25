@@ -1,0 +1,210 @@
+C++ Semantic Style Guide (for LLM Analysis)
+================================================================================
+
+This guide contains SEMANTIC rules for code analysis. Formatting rules
+(tabs/spaces, line length, brace placement) are handled by automated tools
+and should NOT be checked by the LLM analyzer.
+
+================================================================================
+
+CRITICAL SEVERITY - Must Fix (Correctness & Safety Issues)
+================================================================================
+
+Memory Management:
+- All dynamically allocated memory (new/malloc) must have a corresponding delete/free
+- No memory leaks - check for unmatched allocation/deallocation pairs
+- Array allocations (new[]) must use array delete (delete[])
+- No dangling pointers - pointers should be set to nullptr after deletion
+- No double deletion of the same memory
+
+Control Flow Issues:
+- All switch statements must have a default case
+- No use of goto statements (violates structured programming)
+- Return statements must be present in all non-void functions for all code paths
+
+Variable Safety:
+- Function parameters must not shadow member variables
+- Local variables must not shadow outer scope variables
+- No use of uninitialized variables
+
+Magic Numbers:
+- No hardcoded numeric literals (except 0, 1, -1 in obvious contexts)
+- Use named constants (const int, constexpr) instead of magic numbers
+- Exception: Array indices and loop counters (i = 0, i < 10, etc.)
+
+
+WARNING SEVERITY - Should Fix (Best Practices & Maintainability)
+================================================================================
+
+Naming Conventions:
+- Function names should use camelCase (e.g., calculateSum, not calculate_sum)
+- Class names should use PascalCase (e.g., BankAccount, not bank_account)
+- Member variables should have descriptive names (avoid single letters except i, j, k for loops)
+- Constants should use UPPER_CASE or kConstantName conventions
+
+Code Structure:
+- Avoid deeply nested code (more than 3 levels of nesting)
+- Functions should be reasonably short (under 50 lines)
+- Complex algorithms should have explanatory comments
+- Break long functions into smaller, focused helper functions
+
+Modern C++ Practices:
+- Use nullptr instead of NULL or 0 for null pointers
+- Use const correctness for function parameters and member functions
+- Prefer smart pointers (unique_ptr, shared_ptr) over raw pointers for ownership
+- Use auto for complex iterator types, but not for basic types where clarity is lost
+
+Header File Best Practices:
+- Include guards must be present in all header files (#ifndef, #define, #endif)
+- Avoid "using namespace std" in header files (causes namespace pollution)
+- Forward declare classes when possible instead of including headers
+
+Control Structures:
+- All control structures (if, for, while, switch) must use braces even for single statements
+- Prefer pre-increment (++i) over post-increment (i++) in loops for consistency
+
+
+MINOR SEVERITY - Good Practice (Code Quality & Readability)
+================================================================================
+
+Documentation:
+- Files should have header comments describing purpose and author
+- Functions should have brief comments explaining their purpose
+- Complex algorithms should include explanatory comments
+- Public APIs should be documented
+
+Code Organization:
+- Group related member functions together in class definitions
+- Separate public/private/protected sections clearly in classes
+- Use meaningful variable names (avoid abbreviations unless well-known)
+- Variable declarations should be one per line for clarity
+
+Readability:
+- Use whitespace around operators for readability (e.g., a + b not a+b)
+- Add blank lines between logical sections of code
+- Align related declarations vertically when it improves readability
+
+
+================================================================================
+Examples of Semantic Issues to Detect
+================================================================================
+
+MEMORY LEAK EXAMPLE:
+void processData() {
+    int* data = new int[100];
+    // ... use data ...
+    // CRITICAL: Missing delete[] - memory leak!
+}
+
+CORRECT VERSION:
+void processData() {
+    int* data = new int[100];
+    // ... use data ...
+    delete[] data;  // Properly freed
+}
+
+
+MAGIC NUMBER EXAMPLE:
+if (age > 18) {  // WARNING: Magic number 18
+    grantAccess();
+}
+
+CORRECT VERSION:
+const int LEGAL_AGE = 18;
+if (age > LEGAL_AGE) {
+    grantAccess();
+}
+
+
+NAMING CONVENTION EXAMPLE:
+class bank_account {  // WARNING: Should be BankAccount (PascalCase)
+    void Calculate_Total();  // WARNING: Should be calculateTotal (camelCase)
+};
+
+CORRECT VERSION:
+class BankAccount {
+    void calculateTotal();
+}
+
+
+NULL VS NULLPTR EXAMPLE:
+int* ptr = NULL;  // WARNING: Use nullptr in modern C++
+
+CORRECT VERSION:
+int* ptr = nullptr;
+
+
+MISSING DEFAULT CASE EXAMPLE:
+switch (choice) {
+    case 1: doAction1(); break;
+    case 2: doAction2(); break;
+    // CRITICAL: Missing default case
+}
+
+CORRECT VERSION:
+switch (choice) {
+    case 1: doAction1(); break;
+    case 2: doAction2(); break;
+    default:
+        handleInvalidChoice();
+        break;
+}
+
+
+SHADOWING EXAMPLE:
+class MyClass {
+    int value;
+
+    void setValue(int value) {  // CRITICAL: Parameter shadows member variable
+        value = value;  // Which value is which?
+    }
+};
+
+CORRECT VERSION:
+class MyClass {
+    int value;
+
+    void setValue(int newValue) {
+        value = newValue;  // Clear distinction
+    }
+};
+
+
+DEEP NESTING EXAMPLE:
+void processData(int x) {
+    if (x > 0) {
+        if (x < 100) {
+            if (x % 2 == 0) {
+                if (x % 3 == 0) {  // WARNING: Too deeply nested (4 levels)
+                    process(x);
+                }
+            }
+        }
+    }
+}
+
+BETTER VERSION (early returns):
+void processData(int x) {
+    if (x <= 0 || x >= 100) return;
+    if (x % 2 != 0) return;
+    if (x % 3 != 0) return;
+    process(x);
+}
+
+
+================================================================================
+Focus Areas for LLM Analysis
+================================================================================
+
+1. MEMORY MANAGEMENT: The most critical area - find all allocation/deallocation mismatches
+2. RESOURCE LEAKS: File handles, network sockets, database connections
+3. LOGIC ERRORS: Uninitialized variables, off-by-one errors, incorrect comparisons
+4. NAMING: Consistency with camelCase/PascalCase conventions
+5. CODE STRUCTURE: Overly complex functions, deep nesting
+6. MODERN C++: Use of nullptr, const correctness, smart pointers
+
+DO NOT analyze formatting (the automated checker handles that).
+
+================================================================================
+End of Semantic Style Guide
+================================================================================
