@@ -36,7 +36,7 @@ class CppAnalyzer:
         use_rag: bool = True
     ) -> AnalysisResult:
         """
-        Analyze a C++ file for style violations (basic runnable MVP without LLM/RAG).
+        Analyze a C++ file for style violations using rule-based checks and optionally LLM+RAG.
 
         Args:
             file_content: Source code content
@@ -49,8 +49,53 @@ class CppAnalyzer:
             AnalysisResult with all detected violations
         """
         try:
+            print(f"\n{'='*60}")
+            print(f"Starting analysis for: {file_name}")
+            print(f"File size: {len(file_content)} characters")
+            print(f"Use RAG: {use_rag}")
+            print(f"{'='*60}\n")
+
             # Basic, deterministic checks driven by the uploaded style guide
+            print("Step 1: Running basic rule-based checks...")
             violations = self._run_basic_checks(file_content, style_guide)
+            print(f"[OK] Found {len(violations)} violations from rule-based checks")
+
+            # If RAG is enabled, use LLM for additional semantic analysis
+            if use_rag:
+                print("\nStep 2: RAG is enabled, retrieving context...")
+                # Get relevant context from RAG
+                rag_context = self._get_rag_context(file_content, style_guide)
+                if rag_context:
+                    print(f"[OK] Retrieved RAG context ({len(rag_context)} characters)")
+                else:
+                    print("[WARN] No RAG context found (vector database may be empty)")
+
+                print("\nStep 3: Calling Ollama/CodeLlama for semantic analysis...")
+                print("[WAIT] This may take 30-60 seconds depending on code complexity...")
+                # Analyze with Ollama using RAG context
+                llm_result = await self.ollama_service.analyze_code(
+                    code=file_content,
+                    style_guide=style_guide,
+                    context=rag_context
+                )
+
+                # Merge LLM violations with rule-based violations
+                if llm_result.get("status") == "success" and llm_result.get("violations"):
+                    print(f"[OK] LLM analysis complete")
+                    llm_violations = self._convert_llm_violations(llm_result["violations"])
+                    print(f"[OK] Found {len(llm_violations)} violations from LLM analysis")
+                    violations.extend(llm_violations)
+                elif llm_result.get("status") == "error":
+                    print(f"[ERROR] LLM analysis failed: {llm_result.get('error', 'Unknown error')}")
+                else:
+                    print("[WARN] LLM returned no violations")
+            else:
+                print("\nStep 2: RAG disabled, skipping LLM analysis")
+
+            # Remove duplicate violations (same line and type)
+            print(f"\nStep 4: Deduplicating violations...")
+            violations = self._deduplicate_violations(violations)
+            print(f"[OK] Final violation count: {len(violations)}")
 
             # Stats
             violations_by_severity = self._count_by_severity(violations)
@@ -67,6 +112,7 @@ class CppAnalyzer:
                 status="success"
             )
         except Exception as e:
+            print(f"Error during analysis: {e}")
             return AnalysisResult(
                 file_name=file_name,
                 file_path=file_path,
@@ -79,11 +125,55 @@ class CppAnalyzer:
                 error_message=str(e)
             )
 
-    def _get_rag_context(self, code: str) -> Optional[str]:
+    def _get_rag_context(self, code: str, style_guide: str) -> Optional[str]:
         """Retrieve relevant context from RAG system"""
-        # TODO: Implement RAG context retrieval
-        # Use code snippets as queries to find relevant style guide sections
-        return None
+        try:
+            # Create a query combining code snippet and style guide info
+            query = f"C++ code analysis style guide rules:\n{code[:500]}"
+
+            # Search for relevant chunks
+            relevant_chunks = self.rag_service.search_relevant_context(query, top_k=3)
+
+            if relevant_chunks:
+                context = "\n\n---\n\n".join(relevant_chunks)
+                return f"Relevant style guide excerpts:\n\n{context}"
+
+            return None
+
+        except Exception as e:
+            print(f"Error retrieving RAG context: {e}")
+            return None
+
+    def _convert_llm_violations(self, llm_violations: List[Dict]) -> List[Violation]:
+        """Convert LLM violation dicts to Violation objects"""
+        violations = []
+        for v in llm_violations:
+            try:
+                violations.append(
+                    Violation(
+                        type=v.get("type", "style_violation"),
+                        severity=ViolationSeverity[v.get("severity", "WARNING")],
+                        line_number=v.get("line_number", 1),
+                        description=v.get("description", "Style violation"),
+                        rule_reference=v.get("rule_reference", ""),
+                        code_snippet=""
+                    )
+                )
+            except Exception as e:
+                print(f"Error converting violation: {e}")
+                continue
+        return violations
+
+    def _deduplicate_violations(self, violations: List[Violation]) -> List[Violation]:
+        """Remove duplicate violations based on line number and type"""
+        seen = set()
+        unique = []
+        for v in violations:
+            key = (v.line_number, v.type)
+            if key not in seen:
+                seen.add(key)
+                unique.append(v)
+        return unique
 
     def _merge_violations(
         self,

@@ -14,7 +14,6 @@ function App() {
   const [activeTab, setActiveTab] = useState<'analysis' | 'rag'>('analysis');
   const [styleGuides, setStyleGuides] = useState<any[]>([]);
   const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
-  const [useRag, setUseRag] = useState<boolean>(false);
   const [analyzing, setAnalyzing] = useState<boolean>(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
@@ -83,7 +82,7 @@ function App() {
     setAnalyzing(true);
     try {
       const fileId = (selectedFile as any).id ?? (selectedFile as any).file_id;
-      const result = await analyzeCode(fileId, selectedGuideId, useRag);
+      const result = await analyzeCode(fileId, selectedGuideId, true); // Always use RAG
       setAnalysisResult(result as any);
     } catch (e: any) {
       setAnalysisError(e?.message || 'Failed to run analysis.');
@@ -149,16 +148,6 @@ function App() {
                   })}
                 </select>
               </div>
-
-              <label className="flex items-center gap-2 text-sm text-gray-300">
-                <input
-                  type="checkbox"
-                  className="form-checkbox rounded text-blue-500"
-                  checked={useRag}
-                  onChange={(e) => setUseRag(e.target.checked)}
-                />
-                Use RAG
-              </label>
 
               <button
                 onClick={runAnalysis}

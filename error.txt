@@ -1,178 +1,67 @@
-SyntaxError: /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/src/App.tsx: Unexpected token (196:9)
-  194 | export default App;
-  195 |           {/* ...existing code for RAG tab, etc... */}
-> 196 |         </>
-      |          ^
-  197 |       </main>
-  198 |     </div>
-  199 |   );
-    at parser.next (<anonymous>)
-    at normalizeFile.next (<anonymous>)
-    at run.next (<anonymous>)
-    at transform.next (<anonymous>)
-ERROR in ./src/App.tsx
-Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/src/App.tsx: Unexpected token (196:9)
-
-  194 | export default App;
-  195 |           {/* ...existing code for RAG tab, etc... */}
-> 196 |         </>
-      |          ^
-  197 |       </main>
-  198 |     </div>
-  199 |   );
-    at constructor (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:367:19)
-    at TypeScriptParserMixin.raise (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:6630:19)
-    at TypeScriptParserMixin.unexpected (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:6650:16)
-    at TypeScriptParserMixin.jsxParseIdentifier (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:4602:12)
-    at TypeScriptParserMixin.jsxParseNamespacedName (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:4609:23)
-    at TypeScriptParserMixin.jsxParseElementName (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:4618:21)
-    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:4694:22)
-    at TypeScriptParserMixin.jsxParseElementAt (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:4719:33)
-    at TypeScriptParserMixin.jsxParseElement (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:4782:17)
-    at TypeScriptParserMixin.parseExprAtom (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:4795:19)
-    at TypeScriptParserMixin.parseExprSubscripts (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:11085:23)
-    at TypeScriptParserMixin.parseUpdate (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:11070:21)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:11050:23)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:9857:18)
-    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10903:61)
-    at TypeScriptParserMixin.parseExprOps (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10908:23)
-    at TypeScriptParserMixin.parseMaybeConditional (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10885:23)
-    at TypeScriptParserMixin.parseMaybeAssign (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10835:21)
-    at /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:9795:39
-    at TypeScriptParserMixin.tryParse (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:6938:20)
-    at TypeScriptParserMixin.parseMaybeAssign (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:9795:18)
-    at TypeScriptParserMixin.parseExpressionBase (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10788:23)
-    at /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10784:39
-    at TypeScriptParserMixin.allowInAnd (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:12431:16)
-    at TypeScriptParserMixin.parseExpression (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10784:17)
-    at TypeScriptParserMixin.parseStatementContent (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:12904:23)
-    at TypeScriptParserMixin.parseStatementContent (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:9532:18)
-    at TypeScriptParserMixin.parseStatementLike (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:12776:17)
-    at TypeScriptParserMixin.parseModuleItem (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:12753:17)
-    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:13325:36)
-    at TypeScriptParserMixin.parseBlockBody (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:13318:10)
-    at TypeScriptParserMixin.parseProgram (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:12634:10)
-    at TypeScriptParserMixin.parseTopLevel (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:12624:25)
-    at TypeScriptParserMixin.parse (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:14501:10)
-    at TypeScriptParserMixin.parse (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:10149:18)
-    at parse (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/parser/lib/index.js:14535:38)
-    at parser (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/core/lib/parser/index.js:41:34)
-    at parser.next (<anonymous>)
-    at normalizeFile (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
-    at normalizeFile.next (<anonymous>)
-    at run (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/core/lib/transformation/index.js:22:50)
-    at run.next (<anonymous>)
-    at transform (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/core/lib/transform.js:22:33)
-    at transform.next (<anonymous>)
-    at step (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/gensync/index.js:261:32)
-    at /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/gensync/index.js:273:13
-    at async.call.result.err.err (/home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/gensync/index.js:223:11)
-    at /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/gensync/index.js:189:28
-    at /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
-    at /home/eeconomou/Documents/CSCI598/CSCI598-Semester-Project/frontend/node_modules/gensync/index.js:113:33
-
-ERROR in [eslint] 
-src/App.tsx
-  Line 196:8:  Parsing error: Declaration or statement expected
-
-webpack compiled with 2 errors
-Files successfully emitted, waiting for typecheck results...
-Issues checking in progress...
-ERROR in src/App.tsx:194:16
-TS2528: A module cannot have multiple default exports.
-    192 | }
-    193 |
-  > 194 | export default App;
-        |                ^^^
-    195 |           {/* ...existing code for RAG tab, etc... */}
-    196 |         </>
-    197 |       </main>
-
-ERROR in src/App.tsx:196:9
-TS1128: Declaration or statement expected.
-    194 | export default App;
-    195 |           {/* ...existing code for RAG tab, etc... */}
-  > 196 |         </>
-        |         ^^
-    197 |       </main>
-    198 |     </div>
-    199 |   );
-
-ERROR in src/App.tsx:196:11
-TS1109: Expression expected.
-    194 | export default App;
-    195 |           {/* ...existing code for RAG tab, etc... */}
-  > 196 |         </>
-        |           ^
-    197 |       </main>
-    198 |     </div>
-    199 |   );
-
-ERROR in src/App.tsx:197:7
-TS1109: Expression expected.
-    195 |           {/* ...existing code for RAG tab, etc... */}
-    196 |         </>
-  > 197 |       </main>
-        |       ^^
-    198 |     </div>
-    199 |   );
-    200 | }
-
-ERROR in src/App.tsx:197:9
-TS2304: Cannot find name 'main'.
-    195 |           {/* ...existing code for RAG tab, etc... */}
-    196 |         </>
-  > 197 |       </main>
-        |         ^^^^
-    198 |     </div>
-    199 |   );
-    200 | }
-
-ERROR in src/App.tsx:198:5
-TS1109: Expression expected.
-    196 |         </>
-    197 |       </main>
-  > 198 |     </div>
-        |     ^^
-    199 |   );
-    200 | }
-    201 |
-
-ERROR in src/App.tsx:198:7
-TS2304: Cannot find name 'div'.
-    196 |         </>
-    197 |       </main>
-  > 198 |     </div>
-        |       ^^^
-    199 |   );
-    200 | }
-    201 |
-
-ERROR in src/App.tsx:199:3
-TS1109: Expression expected.
-    197 |       </main>
-    198 |     </div>
-  > 199 |   );
-        |   ^
-    200 | }
-    201 |
-    202 | export default App;
-
-ERROR in src/App.tsx:200:1
-TS1128: Declaration or statement expected.
-    198 |     </div>
-    199 |   );
-  > 200 | }
-        | ^
-    201 |
-    202 | export default App;
-    203 |
-
-ERROR in src/App.tsx:202:16
-TS2528: A module cannot have multiple default exports.
-    200 | }
-    201 |
-  > 202 | export default App;
-        |                ^^^
-    203 |
+[1] UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
+[1] INFO:     127.0.0.1:50896 - "GET /api/files/289ff8b2-e3d0-470d-83c5-f0a9d2989e8a HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50896 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:50896 - "GET /api/files/289ff8b2-e3d0-470d-83c5-f0a9d2989e8a HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:61957 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1] INFO:     127.0.0.1:61957 - "GET /api/rag/documents HTTP/1.1" 200 OK
+[1]
+[1] ============================================================
+[1] Adding document to RAG database
+[1] Document ID: 4c67c0a1-db50-4be3-bfa0-40b4c8433246
+[1] Type: style_guide
+[1] Content length: 4416 chars
+[1] Metadata: {'filename': 'style_guide.txt'}
+[1] ============================================================
+[1]
+[1] Step 1: Chunking document...
+[1] INFO:     127.0.0.1:61957 - "POST /api/rag/upload?doc_type=style_guide HTTP/1.1" 500 Internal Server Error
+[1] ERROR:    Exception in ASGI application
+[1] Traceback (most recent call last):
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 426, in run_asgi
+[1]     result = await app(  # type: ignore[func-returns-value]
+[1]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 84, in __call__
+[1]     return await self.app(scope, receive, send)
+[1]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\applications.py", line 1106, in __call__
+[1]     await super().__call__(scope, receive, send)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\applications.py", line 122, in __call__
+[1]     await self.middleware_stack(scope, receive, send)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 184, in __call__
+[1]     raise exc
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 162, in __call__
+[1]     await self.app(scope, receive, _send)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 91, in __call__
+[1]     await self.simple_response(scope, receive, send, request_headers=headers)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 146, in simple_response
+[1]     await self.app(scope, receive, send)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 79, in __call__
+[1]     raise exc
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 68, in __call__
+[1]     await self.app(scope, receive, sender)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 20, in __call__
+[1]     raise e
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 17, in __call__
+[1]     await self.app(scope, receive, send)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\routing.py", line 718, in __call__
+[1]     await route.handle(scope, receive, send)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\routing.py", line 276, in handle
+[1]     await self.app(scope, receive, send)
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\starlette\routing.py", line 66, in app
+[1]     response = await func(request)
+[1]                ^^^^^^^^^^^^^^^^^^^
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\routing.py", line 274, in app
+[1]     raw_response = await run_endpoint_function(
+[1]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\venv\Lib\site-packages\fastapi\routing.py", line 191, in run_endpoint_function
+[1]     return await dependant.call(**values)
+[1]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\app\api\rag.py", line 27, in upload_rag_document
+[1]     doc_id = rag_service.add_document(
+[1]              ^^^^^^^^^^^^^^^^^^^^^^^^^
+[1]   File "C:\Users\radio\OneDrive\Desktop\Code\CSCI 598 (LLM Development)\CSCI598-Semester-Project\backend\app\services\rag_service.py", line 66, in add_document
+[1]     print(f"\u2713 Created {len(chunks)} chunks")
+[1]   File "C:\Users\radio\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py", line 19, in encode
+[1]     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[1]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1] UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>

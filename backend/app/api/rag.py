@@ -2,10 +2,14 @@
 RAG system management endpoints
 """
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from app.services.rag_service import RAGService
 
 router = APIRouter()
 
-# In-memory storage for uploaded RAG documents (MVP)
+# Initialize RAG service
+rag_service = RAGService()
+
+# Keep in-memory storage for backward compatibility and quick access
 rag_documents = {}
 
 
@@ -17,16 +21,21 @@ async def upload_rag_document(file: UploadFile = File(...), doc_type: str = "sty
     doc_type: "style_guide" or "reference"
     """
     content = await file.read()
+    content_text = content.decode("utf-8")
 
-    # TODO: Process and add to vector database
-    # For now, just store the content
+    # Add to vector database
+    doc_id = rag_service.add_document(
+        content=content_text,
+        doc_type=doc_type,
+        metadata={"filename": file.filename}
+    )
 
-    doc_id = f"{doc_type}_{file.filename}"
+    # Also store in memory for quick access
     rag_documents[doc_id] = {
         "id": doc_id,
         "filename": file.filename,
         "type": doc_type,
-        "content": content.decode("utf-8"),
+        "content": content_text,
         "status": "stored"
     }
 
@@ -63,8 +72,14 @@ async def list_rag_documents():
 @router.delete("/documents/{doc_id}")
 async def delete_rag_document(doc_id: str):
     """Remove document from RAG knowledge base"""
-    if doc_id not in rag_documents:
+    # Delete from vector database
+    success = rag_service.delete_document(doc_id)
+
+    # Also delete from memory
+    if doc_id in rag_documents:
+        del rag_documents[doc_id]
+
+    if not success and doc_id not in rag_documents:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    del rag_documents[doc_id]
     return {"status": "deleted", "document_id": doc_id}
