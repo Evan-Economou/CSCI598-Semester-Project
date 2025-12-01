@@ -5,11 +5,20 @@ import ViolationPanel from './components/ViolationPanel';
 import { AnalysisResult, UploadedFile, FileTreeNode } from './types';
 import { analyzeCode, listRAGDocuments, uploadRAGDocument } from './services/api';
 import { buildFileTree, removeFileFromTree } from './utils/fileTreeUtils';
+import {
+  saveUploadedFiles,
+  loadUploadedFiles,
+  saveAnalysisResults,
+  loadAnalysisResults,
+  saveSelectedFileId,
+  loadSelectedFileId
+} from './utils/localStorage';
 
 function App() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [analysisResults, setAnalysisResults] = useState<Record<string, AnalysisResult>>({});
   const [styleGuides, setStyleGuides] = useState<any[]>([]);
   const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState<boolean>(false);
@@ -18,6 +27,49 @@ function App() {
 
   // Build file tree from flat list
   const fileTree = useMemo(() => buildFileTree(uploadedFiles), [uploadedFiles]);
+
+  // Load persisted data on mount
+  useEffect(() => {
+    const savedFiles = loadUploadedFiles();
+    const savedResults = loadAnalysisResults();
+    const savedSelectedId = loadSelectedFileId();
+
+    if (savedFiles.length > 0) {
+      setUploadedFiles(savedFiles);
+      setAnalysisResults(savedResults);
+
+      // Restore selected file
+      if (savedSelectedId) {
+        const file = savedFiles.find(f => {
+          const id = (f as any).id || (f as any).file_id;
+          return id === savedSelectedId;
+        });
+        if (file) {
+          setSelectedFile(file);
+          const result = savedResults[savedSelectedId] || null;
+          setAnalysisResult(result);
+        }
+      } else if (savedFiles.length > 0) {
+        setSelectedFile(savedFiles[0]);
+      }
+    }
+  }, []);
+
+  // Persist uploaded files whenever they change
+  useEffect(() => {
+    saveUploadedFiles(uploadedFiles);
+  }, [uploadedFiles]);
+
+  // Persist analysis results whenever they change
+  useEffect(() => {
+    saveAnalysisResults(analysisResults);
+  }, [analysisResults]);
+
+  // Persist selected file ID whenever it changes
+  useEffect(() => {
+    const fileId = selectedFile ? ((selectedFile as any).id || (selectedFile as any).file_id) : null;
+    saveSelectedFileId(fileId);
+  }, [selectedFile]);
 
   const handleFileUpload = (files: UploadedFile[]) => {
     setUploadedFiles(prev => [...prev, ...files]);
@@ -32,6 +84,10 @@ function App() {
       const file = uploadedFiles.find(f => f.file_id === node.file_id);
       if (file) {
         setSelectedFile(file);
+
+        // Load associated analysis result for this file
+        const result = analysisResults[node.file_id] || null;
+        setAnalysisResult(result);
       }
     }
   };
@@ -41,6 +97,14 @@ function App() {
       const id = (f as any).id || (f as any).file_id;
       return id !== fileId;
     }));
+
+    // Delete associated analysis result
+    setAnalysisResults(prev => {
+      const updated = { ...prev };
+      delete updated[fileId];
+      return updated;
+    });
+
     // Clear selection if the deleted file was selected
     if (selectedFile) {
       const selectedId = (selectedFile as any).id || (selectedFile as any).file_id;
@@ -105,7 +169,15 @@ function App() {
     try {
       const fileId = (selectedFile as any).id ?? (selectedFile as any).file_id;
       const result = await analyzeCode(fileId, selectedGuideId, true); // Always use RAG
+
+      // Update current analysis result
       setAnalysisResult(result as any);
+
+      // Save result associated with this file
+      setAnalysisResults(prev => ({
+        ...prev,
+        [fileId]: result as any
+      }));
     } catch (e: any) {
       setAnalysisError(e?.message || 'Failed to run analysis.');
     } finally {
