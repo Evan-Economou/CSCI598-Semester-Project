@@ -205,19 +205,59 @@ When the backend is running, visit:
 ### Still TODO for MVP (Week 1-2)
 
 #### Backend
-- [ ] Implement actual Ollama integration
-- [ ] Implement tree-sitter C++ parsing
-- [ ] Complete RAG service with ChromaDB
-- [ ] Implement style guide parser
-- [ ] Connect analysis pipeline (tree-sitter → RAG → Ollama)
-- [ ] Add async processing for analysis
+- [x] Implement actual Ollama integration ✅ **COMPLETED**
+- [x] Implement LLM-powered code analysis ✅ **COMPLETED**
+- [x] Create violation parsing and merging system ✅ **COMPLETED**
+- [ ] Implement tree-sitter C++ parsing (advanced syntax analysis)
+- [ ] Complete RAG service with ChromaDB (semantic search)
+- [x] Implement style guide parser ✅ **COMPLETED**
+- [x] Connect analysis pipeline (rule-based + LLM) ✅ **COMPLETED**
+- [ ] Add async processing for batch analysis
 
 #### Frontend
-- [ ] Connect API calls to backend
+- [ ] Connect analysis workflow to backend
+- [ ] Display LLM-generated violations in UI
 - [ ] Implement violation highlighting in code editor
 - [ ] Add analysis trigger button
 - [ ] Add loading states and error handling
 - [ ] Implement violation navigation (next/previous)
+
+### Recent Updates (Ollama Integration)
+
+#### ✅ LLM Integration Complete
+The system now includes full Ollama + CodeLlama integration:
+
+- **Two-phase analysis:** Rule-based + LLM semantic analysis
+- **One-sentence descriptions:** Each violation gets a concise explanation
+- **Smart merging:** Deduplicates violations from both sources
+- **RAG-ready:** Structured to easily add RAG context in next phase
+
+**See:** `OLLAMA_INTEGRATION.md` for detailed documentation
+
+#### Quick Start with Ollama
+
+1. **Install Ollama:**
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh
+   ```
+
+2. **Download CodeLlama:**
+   ```bash
+   ollama pull codellama:7b
+   ```
+
+3. **Start Ollama:**
+   ```bash
+   ollama serve
+   ```
+
+4. **Test the integration:**
+   ```bash
+   # Check system status
+   curl -X POST http://localhost:8000/api/setup/check
+   
+   # Should return: "status": "ready"
+   ```
 
 ## Testing the Current Skeleton
 

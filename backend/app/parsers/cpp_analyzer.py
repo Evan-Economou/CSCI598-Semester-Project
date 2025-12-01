@@ -105,7 +105,7 @@ class CppAnalyzer:
             print(f"[OK] Final violation count: {len(violations)}")
             print(f"{'='*60}\n")
 
-            # Stats
+            # Calculate statistics
             violations_by_severity = self._count_by_severity(violations)
             violations_by_type = self._count_by_type(violations)
 
@@ -183,28 +183,37 @@ class CppAnalyzer:
                 unique.append(v)
         return unique
 
-    def _merge_violations(
+    def _merge_violations_smart(
         self,
-        syntax_issues: List[dict],
-        semantic_violations: dict
+        basic_violations: List[Violation],
+        llm_violations: List[Violation]
     ) -> List[Violation]:
-        """Merge violations from different sources"""
-        violations = []
-
-        # Convert syntax issues to Violation objects
-        for issue in syntax_issues:
-            violations.append(
-                Violation(
-                    type=issue.get('type', 'syntax_error'),
-                    severity=ViolationSeverity.CRITICAL,
-                    line_number=issue.get('line', 0),
-                    description=issue.get('message', 'Unknown syntax error')
-                )
-            )
-
-        # TODO: Parse and add semantic violations from LLM response
-
-        return violations
+        """
+        Intelligently merge violations from rule-based and LLM analysis.
+        Deduplicates violations that refer to the same issue.
+        """
+        merged = list(basic_violations)  # Start with all basic violations
+        
+        # Track which lines already have violations
+        existing_line_types = {}
+        for v in basic_violations:
+            key = (v.line_number, v.type)
+            existing_line_types[key] = True
+        
+        # Add LLM violations if they're not duplicates
+        for llm_v in llm_violations:
+            key = (llm_v.line_number, llm_v.type)
+            
+            # Only add if this line+type combo doesn't exist
+            # This prevents duplicate detections of the same issue
+            if key not in existing_line_types:
+                merged.append(llm_v)
+                existing_line_types[key] = True
+        
+        # Sort by line number for easier reading
+        merged.sort(key=lambda v: v.line_number)
+        
+        return merged
 
     # --- Built-in algorithmic checks (always run) ---
 

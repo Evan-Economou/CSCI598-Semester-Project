@@ -1,5 +1,5 @@
 """
-Ollama LLM integration service
+Ollama LLM integration service for C++ code analysis
 """
 import os
 import json
@@ -45,10 +45,10 @@ class OllamaService:
         Args:
             code: C++ source code to analyze
             style_guide: Style guide rules
-            context: Additional context from RAG system
+            context: Additional context from RAG system (for future use)
 
         Returns:
-            Dictionary containing detected violations
+            List of Violation objects
         """
         try:
             import time
@@ -174,12 +174,12 @@ TASK: Find semantic and logic issues in the CODE TO ANALYZE section.
 
 RULES TO CHECK (reference only - NOT code to analyze):
 {style_guide}
-
 """
+
+        # RAG context integration point (for future)
         if context:
             base_prompt += f"""ADDITIONAL CONTEXT:
 {context}
-
 """
 
         base_prompt += f"""
