@@ -54,59 +54,53 @@ class CppAnalyzer:
             print(f"File size: {len(file_content)} characters")
             print(f"{'='*60}\n")
 
-            # Built-in algorithmic checks (always run)
-            print("Step 1: Running built-in algorithmic checks...")
-            print("  - Consistent indentation (tabs/spaces)")
+            # Step 1: Formatting checks
+            print("Step 1: Running formatting checks...")
+            print("  - Proper indentation (nesting levels)")
             print("  - Line length (<200 chars)")
-            print("  - Consistent brace placement")
-            print("  - Single-line if statements")
+            print("  - Single-line if statements (missing braces)")
             print("  - File header comment")
-            print("  - Comment frequency")
-            print("  - No comments check (CRITICAL)")
+            print("  - No comments check - CRITICAL (excluding header)")
             violations = self._run_basic_checks(file_content, style_guide)
-            print(f"[OK] Found {len(violations)} formatting/documentation violations")
+            print(f"[OK] Found {len(violations)} formatting violations")
 
-            # If RAG is enabled, use LLM for semantic analysis
+            # Step 2: Algorithmic semantic checks
+            print("\nStep 2: Running algorithmic semantic checks...")
+            print("  - Memory leaks (new/delete matching)")
+            print("  - Naming conventions (camelCase/PascalCase)")
+
+            # Check if style guide mentions magic numbers
+            check_magic_numbers = False
+            if style_guide:
+                style_guide_lower = style_guide.lower()
+                if 'magic number' in style_guide_lower or 'const' in style_guide_lower or 'named constant' in style_guide_lower:
+                    check_magic_numbers = True
+                    print("  - Magic numbers (hardcoded literals)")
+
+            print("  - NULL vs nullptr")
+            semantic_violations = self._run_semantic_checks(file_content, check_magic_numbers)
+            print(f"[OK] Found {len(semantic_violations)} semantic violations")
+            violations.extend(semantic_violations)
+
+            # Step 3: LLM comment quality check (simple task)
             if use_rag:
-                print("\nStep 2: LLM Semantic Analysis (using uploaded semantic style guide)...")
-                print("  Searching for semantic issues:")
-                print("  - Memory leaks")
-                print("  - Naming conventions")
-                print("  - Magic numbers")
-                print("  - Code structure issues")
-                print("  - Modern C++ best practices")
-
-                # Get relevant context from RAG
-                rag_context = self._get_rag_context(file_content, style_guide)
-                if rag_context:
-                    print(f"[OK] Retrieved RAG context ({len(rag_context)} characters)")
-                else:
-                    print("[WARN] No semantic style guide uploaded - upload semantic_style_guide.txt in RAG Management")
-
-                print("\n  -> Calling Ollama/CodeLlama for semantic analysis...")
-                print("  [WAIT] This may take 30-60 seconds depending on code complexity...")
-                # Analyze with Ollama using RAG context
-                llm_result = await self.ollama_service.analyze_code(
-                    code=file_content,
-                    style_guide=style_guide,
-                    context=rag_context
+                print("\nStep 3: LLM comment quality analysis...")
+                print("  [WAIT] Checking if comments are descriptive...")
+                llm_result = await self.ollama_service.check_comment_quality(
+                    code=file_content
                 )
 
-                # Merge LLM violations with rule-based violations
                 if llm_result.get("status") == "success" and llm_result.get("violations"):
-                    print(f"[OK] LLM semantic analysis complete")
                     llm_violations = self._convert_llm_violations(llm_result["violations"])
-                    print(f"[OK] Found {len(llm_violations)} semantic violations from LLM")
+                    print(f"[OK] Found {len(llm_violations)} comment quality issues")
                     violations.extend(llm_violations)
-                elif llm_result.get("status") == "error":
-                    print(f"[ERROR] LLM analysis failed: {llm_result.get('error', 'Unknown error')}")
                 else:
-                    print("[WARN] LLM returned no semantic violations")
+                    print("[OK] Comments are adequately descriptive")
             else:
-                print("\nStep 2: RAG disabled, skipping semantic LLM analysis")
+                print("\nStep 3: LLM disabled, skipping comment quality check")
 
             # Remove duplicate violations (same line and type)
-            print(f"\nStep 3: Deduplicating violations...")
+            print(f"\nStep 4: Deduplicating violations...")
             violations = self._deduplicate_violations(violations)
             print(f"[OK] Final violation count: {len(violations)}")
             print(f"{'='*60}\n")
@@ -222,61 +216,135 @@ class CppAnalyzer:
         violations: List[Violation] = []
         lines = code.split('\n')
 
-        # 1. Check for consistent indentation
-        violations.extend(self._check_consistent_indentation(lines))
+        try:
+            # 1. Check for proper indentation (nesting levels)
+            violations.extend(self._check_proper_indentation(lines))
+        except Exception as e:
+            print(f"[ERROR] in _check_proper_indentation: {e}")
 
-        # 2. Check for extremely long lines (>200 chars)
-        violations.extend(self._check_line_length(lines, 200))
+        try:
+            # 2. Check for extremely long lines (>200 chars)
+            violations.extend(self._check_line_length(lines, 200))
+        except Exception as e:
+            print(f"[ERROR] in _check_line_length: {e}")
 
-        # 3. Check for consistent brace placement
-        violations.extend(self._check_consistent_braces(lines))
+        try:
+            # 3. Check for single-line if statements without braces
+            violations.extend(self._check_single_line_if_statements(lines))
+        except Exception as e:
+            print(f"[ERROR] in _check_single_line_if_statements: {e}")
 
-        # 4. Check for single-line if statements without braces
-        violations.extend(self._check_single_line_if_statements(lines))
+        try:
+            # 4. Check for file header comment
+            violations.extend(self._check_file_header_comment(lines))
+        except Exception as e:
+            print(f"[ERROR] in _check_file_header_comment: {e}")
 
-        # 5. Check for file header comment
-        violations.extend(self._check_file_header_comment(lines))
-
-        # 6. Check comment frequency (every 20 lines)
-        violations.extend(self._check_comment_frequency(lines))
-
-        # 7. CRITICAL: Check if file has NO comments at all
-        violations.extend(self._check_no_comments(lines))
+        try:
+            # 5. CRITICAL: Check if file has NO comments (excluding header)
+            violations.extend(self._check_no_comments(lines))
+        except Exception as e:
+            print(f"[ERROR] in _check_no_comments: {e}")
 
         return violations
 
-    def _check_consistent_indentation(self, lines: List[str]) -> List[Violation]:
-        """Check for consistent indentation (tabs OR spaces, but consistent)"""
+    def _check_proper_indentation(self, lines: List[str]) -> List[Violation]:
+        """Check for proper indentation based on brace nesting levels"""
         violations = []
         uses_tabs = None
         uses_spaces = None
+        indent_size = None
 
-        for i, line in enumerate(lines, 1):
-            if not line.strip():  # Skip empty lines
-                continue
-
-            # Get leading whitespace
-            leading = len(line) - len(line.lstrip())
-            if leading == 0:
+        # First pass: determine if file uses tabs or spaces and indentation size
+        for line in lines:
+            if not line.strip() or len(line) == len(line.lstrip()):
                 continue
 
             # Check what type of indentation is used
             if line[0] == '\t':
+                if uses_spaces:
+                    # Mixing tabs and spaces
+                    violations.append(Violation(
+                        type="mixed_indentation",
+                        severity=ViolationSeverity.WARNING,
+                        line_number=1,
+                        description="File mixes tabs and spaces for indentation. Use one consistently.",
+                        rule_reference="Consistent Indentation"
+                    ))
+                    return violations
                 uses_tabs = True
+                indent_size = 1
             elif line[0] == ' ':
+                if uses_tabs:
+                    # Mixing tabs and spaces
+                    violations.append(Violation(
+                        type="mixed_indentation",
+                        severity=ViolationSeverity.WARNING,
+                        line_number=1,
+                        description="File mixes tabs and spaces for indentation. Use one consistently.",
+                        rule_reference="Consistent Indentation"
+                    ))
+                    return violations
                 uses_spaces = True
+                if indent_size is None:
+                    # Use standard: 4 spaces = 1 tab = 1 level
+                    indent_size = 4
 
-            # If mixing tabs and spaces, that's a violation
-            if uses_tabs and uses_spaces:
-                violations.append(Violation(
-                    type="inconsistent_indentation",
-                    severity=ViolationSeverity.WARNING,
-                    line_number=i,
-                    description="File mixes tabs and spaces for indentation. Use one consistently.",
-                    rule_reference="Consistent Indentation",
-                    code_snippet=line.rstrip()
-                ))
-                break  # Only report once
+        if uses_tabs is None and uses_spaces is None:
+            # No indented lines found
+            return violations
+
+        # Second pass: check that indentation levels match brace nesting
+        expected_level = 0
+        in_switch = False
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Skip empty lines and preprocessor directives
+            if not stripped or stripped.startswith('#'):
+                continue
+
+            # Calculate current indentation level
+            if uses_tabs:
+                current_indent = len(line) - len(line.lstrip('\t'))
+            else:
+                leading_spaces = len(line) - len(line.lstrip(' '))
+                current_indent = leading_spaces // indent_size if indent_size > 0 else 0
+
+            # Track if we're in a switch statement
+            if 'switch' in stripped and '{' in stripped:
+                in_switch = True
+
+            # Check for closing braces (decrease expected level before checking)
+            if stripped.startswith('}'):
+                expected_level = max(0, expected_level - 1)
+                if in_switch:
+                    in_switch = False
+
+            # Check if indentation matches expected level
+            if current_indent != expected_level and not stripped.startswith('}'):
+                # Allow flexibility for:
+                # - Labels (anything ending with :)
+                # - Access specifiers
+                # - Case statements and their contents (allow expected_level OR expected_level + 1)
+                is_label = stripped.endswith(':') or stripped in ['public:', 'private:', 'protected:']
+                is_case_related = stripped.startswith('case ') or stripped.startswith('default')
+                is_inside_switch = in_switch and (current_indent == expected_level + 1 or is_case_related)
+
+                if not (is_label or is_inside_switch):
+                    violations.append(Violation(
+                        type="improper_indentation",
+                        severity=ViolationSeverity.WARNING,
+                        line_number=i,
+                        description=f"Indentation level {current_indent} does not match expected nesting level {expected_level}",
+                        rule_reference="Proper Indentation",
+                        code_snippet=line.rstrip()
+                    ))
+
+            # Check for opening braces (increase expected level after this line)
+            if '{' in stripped and not stripped.startswith('}'):
+                expected_level += stripped.count('{') - stripped.count('}')
 
         return violations
 
@@ -336,12 +404,50 @@ class CppAnalyzer:
         for i, line in enumerate(lines, 1):
             stripped = line.strip()
 
-            # Match if/for/while without braces on same line or next line
-            if re.match(r'^\s*(if|for|while)\s*\([^)]+\)\s*[^{;]', line):
-                # Check if next line has a brace
+            # Match if/for/while at the start
+            keyword_match = re.match(r'^\s*(if|else\s+if|for|while)\s*\(', line)
+            if keyword_match:
+                # Find the matching closing parenthesis by counting parens
+                paren_count = 0
+                paren_start = keyword_match.end() - 1  # Position of opening '('
+                paren_end = -1
+
+                for pos in range(paren_start, len(line)):
+                    if line[pos] == '(':
+                        paren_count += 1
+                    elif line[pos] == ')':
+                        paren_count -= 1
+                        if paren_count == 0:
+                            paren_end = pos
+                            break
+
+                if paren_end == -1:
+                    # Couldn't find matching paren, skip
+                    continue
+
+                # Check what comes after the closing paren
+                remainder = line[paren_end + 1:].strip()
+
+                # If there's a brace on same line, it's OK
+                if remainder.startswith('{'):
+                    continue
+
+                # If there's code on the same line (one-liner), it's a violation
+                if remainder and not remainder.startswith('//'):
+                    violations.append(Violation(
+                        type="missing_braces",
+                        severity=ViolationSeverity.WARNING,
+                        line_number=i,
+                        description="Control structure should use braces even for single statements",
+                        rule_reference="Always Use Braces",
+                        code_snippet=stripped
+                    ))
+                    continue
+
+                # If next line doesn't start with '{', it's a violation
                 if i < len(lines):
                     next_stripped = lines[i].strip()
-                    if next_stripped and not next_stripped.startswith('{'):
+                    if next_stripped and not next_stripped.startswith('{') and not next_stripped.startswith('//'):
                         violations.append(Violation(
                             type="missing_braces",
                             severity=ViolationSeverity.WARNING,
@@ -409,24 +515,255 @@ class CppAnalyzer:
         return violations
 
     def _check_no_comments(self, lines: List[str]) -> List[Violation]:
-        """CRITICAL: Check if file has NO comments at all"""
+        """CRITICAL: Check if file has NO comments (excluding header comments)"""
         violations = []
-        has_any_comment = False
+        has_non_header_comment = False
 
-        for line in lines:
-            stripped = line.strip()
-            if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*'):
-                has_any_comment = True
-                break
+        # Skip first 10 lines (header comment area)
+        for i, line in enumerate(lines):
+            if i >= 10:  # Only check lines after the header
+                stripped = line.strip()
+                if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*'):
+                    has_non_header_comment = True
+                    break
 
-        if not has_any_comment:
+        if not has_non_header_comment:
             violations.append(Violation(
                 type="no_comments",
                 severity=ViolationSeverity.CRITICAL,
-                line_number=1,
-                description="File contains NO comments. Code must be documented for maintainability.",
+                line_number=11,
+                description="File contains NO comments beyond the header. Code must be documented for maintainability.",
                 rule_reference="Code Documentation"
             ))
+
+        return violations
+
+    # --- Algorithmic semantic checks (always run) ---
+
+    def _run_semantic_checks(self, code: str, check_magic_numbers: bool = False) -> List[Violation]:
+        """
+        Run algorithmic semantic checks for memory leaks, naming, magic numbers, etc.
+        These are deterministic and don't rely on LLM.
+
+        Args:
+            code: Source code to analyze
+            check_magic_numbers: Whether to check for magic numbers (based on style guide)
+        """
+        violations: List[Violation] = []
+        lines = code.split('\n')
+
+        try:
+            violations.extend(self._check_memory_leaks(lines))
+        except Exception as e:
+            print(f"[ERROR] in _check_memory_leaks: {e}")
+
+        try:
+            violations.extend(self._check_naming_conventions(lines))
+        except Exception as e:
+            print(f"[ERROR] in _check_naming_conventions: {e}")
+
+        # Only check magic numbers if style guide mentions it
+        if check_magic_numbers:
+            try:
+                violations.extend(self._check_magic_numbers(lines))
+            except Exception as e:
+                print(f"[ERROR] in _check_magic_numbers: {e}")
+
+        try:
+            violations.extend(self._check_null_vs_nullptr(lines))
+        except Exception as e:
+            print(f"[ERROR] in _check_null_vs_nullptr: {e}")
+
+        return violations
+
+    def _check_memory_leaks(self, lines: List[str]) -> List[Violation]:
+        """Detect simple memory leaks - new without corresponding delete"""
+        violations = []
+
+        # Track all new allocations and deletes in the code
+        new_patterns = []
+        delete_patterns = []
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Skip comments
+            if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*'):
+                continue
+
+            # Find new allocations
+            if 'new ' in stripped or 'new[' in stripped:
+                # Extract variable name if possible
+                match = re.search(r'(\w+)\s*=\s*new\s+', stripped)
+                if match:
+                    var_name = match.group(1)
+                    is_array = 'new[]' in stripped or re.search(r'new\s+\w+\[', stripped)
+                    new_patterns.append({
+                        'line': i,
+                        'var': var_name,
+                        'is_array': is_array,
+                        'matched': False
+                    })
+
+            # Find delete statements
+            if 'delete ' in stripped or 'delete[]' in stripped:
+                match = re.search(r'delete\s*\[\s*\]?\s*(\w+)', stripped)
+                if not match:
+                    match = re.search(r'delete\s+(\w+)', stripped)
+                if match:
+                    var_name = match.group(1)
+                    is_array_delete = 'delete[]' in stripped or 'delete [' in stripped
+                    delete_patterns.append({
+                        'var': var_name,
+                        'is_array': is_array_delete
+                    })
+
+        # Match news with deletes
+        for new in new_patterns:
+            for delete in delete_patterns:
+                if new['var'] == delete['var']:
+                    new['matched'] = True
+                    # Check for delete/delete[] mismatch
+                    if new['is_array'] and not delete['is_array']:
+                        violations.append(Violation(
+                            type="wrong_delete_type",
+                            severity=ViolationSeverity.CRITICAL,
+                            line_number=new['line'],
+                            description=f"Array allocated with 'new[]' but deleted with 'delete' (should use 'delete[]')",
+                            rule_reference="Memory Management"
+                        ))
+                    elif not new['is_array'] and delete['is_array']:
+                        violations.append(Violation(
+                            type="wrong_delete_type",
+                            severity=ViolationSeverity.CRITICAL,
+                            line_number=new['line'],
+                            description=f"Single object allocated with 'new' but deleted with 'delete[]' (should use 'delete')",
+                            rule_reference="Memory Management"
+                        ))
+                    break
+
+        # Report unmatched news as memory leaks
+        for new in new_patterns:
+            if not new['matched']:
+                delete_type = "delete[]" if new['is_array'] else "delete"
+                violations.append(Violation(
+                    type="memory_leak",
+                    severity=ViolationSeverity.CRITICAL,
+                    line_number=new['line'],
+                    description=f"Memory allocated with 'new' but no corresponding '{delete_type}' found for variable '{new['var']}'",
+                    rule_reference="Memory Management"
+                ))
+
+        return violations
+
+    def _check_naming_conventions(self, lines: List[str]) -> List[Violation]:
+        """Check for camelCase functions and PascalCase classes"""
+        violations = []
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Skip comments and preprocessor directives
+            if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*') or stripped.startswith('#'):
+                continue
+
+            # Check class names (should be PascalCase)
+            class_match = re.search(r'\bclass\s+([a-zA-Z_]\w*)', stripped)
+            if class_match:
+                class_name = class_match.group(1)
+                # PascalCase: starts with uppercase, no underscores
+                if not re.match(r'^[A-Z][a-zA-Z0-9]*$', class_name):
+                    violations.append(Violation(
+                        type="naming_convention",
+                        severity=ViolationSeverity.WARNING,
+                        line_number=i,
+                        description=f"Class '{class_name}' should use PascalCase (e.g., 'MyClass')",
+                        rule_reference="Naming Conventions",
+                        code_snippet=stripped
+                    ))
+
+            # Check function names (should be camelCase)
+            # Match: return_type function_name(
+            func_match = re.search(r'\b([a-z_]\w*)\s*\([^)]*\)\s*[{;]', stripped)
+            if func_match and 'if' not in stripped and 'for' not in stripped and 'while' not in stripped and 'switch' not in stripped:
+                func_name = func_match.group(1)
+                # Exclude constructors, main, common keywords
+                if func_name not in ['main', 'if', 'for', 'while', 'switch', 'return']:
+                    # camelCase: starts with lowercase, no underscores (except single letter at start)
+                    if '_' in func_name:
+                        violations.append(Violation(
+                            type="naming_convention",
+                            severity=ViolationSeverity.WARNING,
+                            line_number=i,
+                            description=f"Function '{func_name}' should use camelCase, not snake_case (e.g., 'myFunction')",
+                            rule_reference="Naming Conventions",
+                            code_snippet=stripped
+                        ))
+
+        return violations
+
+    def _check_magic_numbers(self, lines: List[str]) -> List[Violation]:
+        """Detect hardcoded numeric literals (magic numbers)"""
+        violations = []
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Skip comments, preprocessor, and includes
+            if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*') or stripped.startswith('#'):
+                continue
+
+            # Find numeric literals that aren't 0, 1, -1
+            # Exclude: loop counters (i = 0, i < 10), array indices
+            numbers = re.findall(r'\b(\d+\.?\d*)\b', stripped)
+
+            for num in numbers:
+                # Allow 0, 1, and single-digit numbers in certain contexts
+                if num in ['0', '1']:
+                    continue
+
+                # Skip if in loop context
+                if re.search(r'(for|while)\s*\([^)]*' + num, stripped):
+                    continue
+
+                # Skip if it looks like array size or index
+                if re.search(r'\[' + num + r'\]', stripped):
+                    continue
+
+                # Flag as magic number
+                violations.append(Violation(
+                    type="magic_number",
+                    severity=ViolationSeverity.WARNING,
+                    line_number=i,
+                    description=f"Magic number '{num}' should be a named constant (e.g., 'const int MAX_SIZE = {num}')",
+                    rule_reference="Magic Numbers",
+                    code_snippet=stripped
+                ))
+                break  # Only report once per line
+
+        return violations
+
+    def _check_null_vs_nullptr(self, lines: List[str]) -> List[Violation]:
+        """Check for NULL usage instead of nullptr"""
+        violations = []
+
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+
+            # Skip comments
+            if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*'):
+                continue
+
+            # Check for NULL (but not in #define NULL or comments)
+            if re.search(r'\bNULL\b', stripped) and not stripped.startswith('#'):
+                violations.append(Violation(
+                    type="use_nullptr",
+                    severity=ViolationSeverity.WARNING,
+                    line_number=i,
+                    description="Use 'nullptr' instead of 'NULL' in modern C++",
+                    rule_reference="Modern C++ Practices",
+                    code_snippet=stripped
+                ))
 
         return violations
 

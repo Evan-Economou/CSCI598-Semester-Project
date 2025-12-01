@@ -162,72 +162,140 @@ class OllamaService:
     ) -> str:
         """Construct the prompt for code analysis"""
 
-        base_prompt = f"""You are a C++ semantic code analyzer. Your task is to find SEMANTIC and LOGIC issues in the code.
-
-IMPORTANT INSTRUCTIONS:
-1. ONLY check for semantic issues (memory management, naming conventions, logic errors, code structure)
-2. DO NOT check for formatting issues (tabs/spaces, line length, brace placement, trailing whitespace) - these are handled by automated tools
-3. Find ALL instances of each violation type, not just the first one
-4. Report ONLY actual code lines - DO NOT report comment lines or blank lines
-5. Be precise with line numbers - count from line 1 at the top of the file
-
-Style Guide (focus on semantic rules only):
-{style_guide}
-
-"""
-        if context:
-            base_prompt += f"""Additional Context from Knowledge Base:
-{context}
-
-"""
-
         # Add line numbers to code for better accuracy
         numbered_lines = []
         for i, line in enumerate(code.split('\n'), 1):
             numbered_lines.append(f"{i:4d} | {line}")
         numbered_code = '\n'.join(numbered_lines)
 
-        base_prompt += f"""Code to Analyze (with line numbers):
-{numbered_code}
+        base_prompt = f"""You are a C++ semantic code analyzer. Analyze ONLY the user's code shown below.
 
-FOCUS YOUR ANALYSIS ON:
-- Memory leaks (unmatched new/delete, malloc/free)
-- Naming conventions (camelCase for functions, PascalCase for classes)
-- Use of magic numbers (hardcoded numbers without named constants)
-- Missing const correctness
-- Shadowing variables
-- Missing default cases in switch statements
-- Use of nullptr vs NULL
-- Deep nesting (more than 3 levels)
-- Function length (over 50 lines)
-- Missing include guards
-- Memory management issues
+TASK: Find semantic and logic issues in the CODE TO ANALYZE section.
+
+RULES TO CHECK (reference only - NOT code to analyze):
+{style_guide}
+
+"""
+        if context:
+            base_prompt += f"""ADDITIONAL CONTEXT:
+{context}
+
+"""
+
+        base_prompt += f"""
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+CODE TO ANALYZE (with line numbers):
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+{numbered_code}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+END OF CODE - Analyze the code above ONLY
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+WHAT TO LOOK FOR:
+- Memory leaks: new/malloc without delete/free
+- Wrong delete: delete[] vs delete mismatch
+- Naming: camelCase for functions, PascalCase for classes
+- Magic numbers: hardcoded values like 18, 500, 1.15
+- NULL vs nullptr
+- Missing switch default
+- Variable shadowing
+- Deep nesting (>3 levels)
+- Long functions (>50 lines)
+- Uninitialized variables
 
 DO NOT REPORT:
-- Tabs vs spaces
-- Line length
-- Brace placement
-- Trailing whitespace
-- Indentation issues
+- Formatting (tabs/spaces/braces/line length)
+- Missing comments (handled separately)
 
-For each violation found:
-1. Type: Brief name of the violation (e.g., "magic_number", "memory_leak", "naming_convention")
-2. Severity: CRITICAL (memory issues, undefined behavior), WARNING (style, best practices), or MINOR (suggestions)
-3. Line number: The EXACT line number from the numbered code above (look at the number before the |)
-4. Description: Clear explanation of the violation
-5. Rule reference: Which style guide rule this violates
+CRITICAL: Before reporting a violation, verify:
+1. The violation exists in the CODE TO ANALYZE section (NOT the rules section)
+2. The line number is correct (use numbers before the | symbol)
+3. The code on that line actually has the issue you're reporting
 
-Format your response as a JSON array:
+OUTPUT FORMAT (JSON array only, no other text):
 [
   {{
-    "type": "violation_type",
-    "severity": "CRITICAL|WARNING|MINOR",
-    "line_number": 42,
-    "description": "Detailed description of the violation",
-    "rule_reference": "Style guide rule name"
+    "type": "memory_leak",
+    "severity": "CRITICAL",
+    "line_number": 5,
+    "description": "new int[100] without delete[]",
+    "rule_reference": "Memory Management"
   }}
 ]
 
-IMPORTANT: Find ALL instances of each violation, not just examples. Only return the JSON array, no other text."""
+If NO violations found, return: []
+
+Only return valid JSON. No explanations, no markdown, just the JSON array."""
 
         return base_prompt
+
+    async def check_comment_quality(self, code: str) -> Dict[str, Any]:
+        """
+        Simple LLM task: Check if comments are descriptive and useful.
+        This is a basic task the LLM can reliably handle.
+
+        Args:
+            code: C++ source code to analyze
+
+        Returns:
+            Dictionary containing comment quality issues
+        """
+        try:
+            # Add line numbers to code
+            numbered_lines = []
+            for i, line in enumerate(code.split('\n'), 1):
+                numbered_lines.append(f"{i:4d} | {line}")
+            numbered_code = '\n'.join(numbered_lines)
+
+            prompt = f"""You are checking comment quality in C++ code. This is a SIMPLE task.
+
+CODE WITH LINE NUMBERS:
+{numbered_code}
+
+TASK: Find comments that are NOT descriptive or useful.
+
+ONLY report comments that are:
+1. Too vague (e.g., "// x" or "// temp")
+2. Completely unhelpful (e.g., "// code" or "// function")
+3. Obvious/redundant (e.g., "// increment i" for i++)
+
+DO NOT report:
+- Missing comments (handled separately)
+- Code issues (only check comments)
+
+If ALL comments are adequately descriptive, return: []
+
+OUTPUT FORMAT (JSON array only, no other text):
+[
+  {{
+    "type": "poor_comment_quality",
+    "severity": "MINOR",
+    "line_number": 5,
+    "description": "Comment is too vague",
+    "rule_reference": "Code Documentation"
+  }}
+]
+
+Only return valid JSON. If no issues, return: []"""
+
+            response = self.client.chat(
+                model=self.model,
+                messages=[{'role': 'user', 'content': prompt}],
+                options={'temperature': 0.1, 'num_predict': 500}
+            )
+
+            response_text = response['message']['content']
+            violations = self._parse_llm_response(response_text)
+
+            return {
+                "violations": violations,
+                "status": "success"
+            }
+
+        except Exception as e:
+            print(f"[ERROR] Error during comment quality check: {e}")
+            return {
+                "violations": [],
+                "status": "error",
+                "error": str(e)
+            }

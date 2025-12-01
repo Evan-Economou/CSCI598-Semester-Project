@@ -27,11 +27,6 @@ Variable Safety:
 - Local variables must not shadow outer scope variables
 - No use of uninitialized variables
 
-Magic Numbers:
-- No hardcoded numeric literals (except 0, 1, -1 in obvious contexts)
-- Use named constants (const int, constexpr) instead of magic numbers
-- Exception: Array indices and loop counters (i = 0, i < 10, etc.)
-
 
 WARNING SEVERITY - Should Fix (Best Practices & Maintainability)
 ================================================================================
@@ -40,7 +35,6 @@ Naming Conventions:
 - Function names should use camelCase (e.g., calculateSum, not calculate_sum)
 - Class names should use PascalCase (e.g., BankAccount, not bank_account)
 - Member variables should have descriptive names (avoid single letters except i, j, k for loops)
-- Constants should use UPPER_CASE or kConstantName conventions
 
 Code Structure:
 - Avoid deeply nested code (more than 3 levels of nesting)
@@ -50,7 +44,6 @@ Code Structure:
 
 Modern C++ Practices:
 - Use nullptr instead of NULL or 0 for null pointers
-- Use const correctness for function parameters and member functions
 - Prefer smart pointers (unique_ptr, shared_ptr) over raw pointers for ownership
 - Use auto for complex iterator types, but not for basic types where clarity is lost
 
@@ -86,113 +79,6 @@ Readability:
 
 
 ================================================================================
-Examples of Semantic Issues to Detect
-================================================================================
-
-MEMORY LEAK EXAMPLE:
-void processData() {
-    int* data = new int[100];
-    // ... use data ...
-    // CRITICAL: Missing delete[] - memory leak!
-}
-
-CORRECT VERSION:
-void processData() {
-    int* data = new int[100];
-    // ... use data ...
-    delete[] data;  // Properly freed
-}
-
-
-MAGIC NUMBER EXAMPLE:
-if (age > 18) {  // WARNING: Magic number 18
-    grantAccess();
-}
-
-CORRECT VERSION:
-const int LEGAL_AGE = 18;
-if (age > LEGAL_AGE) {
-    grantAccess();
-}
-
-
-NAMING CONVENTION EXAMPLE:
-class bank_account {  // WARNING: Should be BankAccount (PascalCase)
-    void Calculate_Total();  // WARNING: Should be calculateTotal (camelCase)
-};
-
-CORRECT VERSION:
-class BankAccount {
-    void calculateTotal();
-}
-
-
-NULL VS NULLPTR EXAMPLE:
-int* ptr = NULL;  // WARNING: Use nullptr in modern C++
-
-CORRECT VERSION:
-int* ptr = nullptr;
-
-
-MISSING DEFAULT CASE EXAMPLE:
-switch (choice) {
-    case 1: doAction1(); break;
-    case 2: doAction2(); break;
-    // CRITICAL: Missing default case
-}
-
-CORRECT VERSION:
-switch (choice) {
-    case 1: doAction1(); break;
-    case 2: doAction2(); break;
-    default:
-        handleInvalidChoice();
-        break;
-}
-
-
-SHADOWING EXAMPLE:
-class MyClass {
-    int value;
-
-    void setValue(int value) {  // CRITICAL: Parameter shadows member variable
-        value = value;  // Which value is which?
-    }
-};
-
-CORRECT VERSION:
-class MyClass {
-    int value;
-
-    void setValue(int newValue) {
-        value = newValue;  // Clear distinction
-    }
-};
-
-
-DEEP NESTING EXAMPLE:
-void processData(int x) {
-    if (x > 0) {
-        if (x < 100) {
-            if (x % 2 == 0) {
-                if (x % 3 == 0) {  // WARNING: Too deeply nested (4 levels)
-                    process(x);
-                }
-            }
-        }
-    }
-}
-
-BETTER VERSION (early returns):
-void processData(int x) {
-    if (x <= 0 || x >= 100) return;
-    if (x % 2 != 0) return;
-    if (x % 3 != 0) return;
-    process(x);
-}
-
-
-================================================================================
 Focus Areas for LLM Analysis
 ================================================================================
 
@@ -201,7 +87,7 @@ Focus Areas for LLM Analysis
 3. LOGIC ERRORS: Uninitialized variables, off-by-one errors, incorrect comparisons
 4. NAMING: Consistency with camelCase/PascalCase conventions
 5. CODE STRUCTURE: Overly complex functions, deep nesting
-6. MODERN C++: Use of nullptr, const correctness, smart pointers
+6. MODERN C++: Use of nullptr, smart pointers
 
 DO NOT analyze formatting (the automated checker handles that).
 
