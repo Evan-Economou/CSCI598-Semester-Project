@@ -77,7 +77,6 @@ frontend/electron/build/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Local test files
+# Local test files (temporary test files only, not demo files)
 *.test.cpp
 *.test.hpp
-test_files/
