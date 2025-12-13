@@ -39,24 +39,10 @@ The **Code Style Grader** is a web-based application designed to help educators 
 - **Privacy**: All analysis runs locally - no cloud APIs, no data transmission
 - **Cost**: Zero API fees - uses local Ollama + CodeLlama 7B
 
-### Value Proposition
-
-**For Educators:**
-- Reduce grading time from 10 minutes → 10 seconds per submission
-- Ensure consistent application of style guidelines
-- Provide detailed, educational feedback to students
-- Focus on teaching concepts rather than checking formatting
-
-**For Students:**
-- Receive immediate, actionable feedback
-- Understand what's wrong and why it matters (severity levels: CRITICAL, WARNING, MINOR)
-- Learn professional coding standards
-- See exact line numbers and explanations
-
 ### Key Features
 
 ✅ **Analysis Capabilities:**
-- 10+ violation types detected automatically
+- Many violation types detected automatically
 - Color-coded severity levels (🔴 CRITICAL, 🟠 WARNING, 🔵 MINOR)
 - Customizable style guidelines via plain-text files
 
@@ -234,7 +220,7 @@ Once all three services are running, follow these steps:
 
 ### Test Files Overview
 
-The `test_files/` directory contains examples demonstrating each capability:
+The `test_files/` directory contains examples demonstrating a breadth of capabilities:
 
 | File | Demonstrates |
 |------|--------------|
@@ -264,8 +250,7 @@ The `test_files/` directory contains examples demonstrating each capability:
 - Check Frontend: http://localhost:3000 (should show the application)
 
 **If analysis is slow (>10 seconds):**
-- This is normal for the first analysis while the LLM loads
-- Subsequent analyses should be 1-2 seconds
+- This is normal due to Ollama response time
 
 **For detailed documentation:**
 - See `GRADING_GUIDE.md` for a 10-minute walkthrough with expected outputs
